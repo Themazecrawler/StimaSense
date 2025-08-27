@@ -1,0 +1,49 @@
+{
+  "format": "layers-model",
+  "generatedBy": "keras v2.19.0",
+  "convertedBy": "TensorFlow.js Converter v4.17.0",
+  "modelTopology": {
+    "keras_version": "2.19.0",
+    "backend": "tensorflow",
+    "model_config": {
+      "name": "outage_prediction_model",
+      "layers": [
+        {
+          "class_name": "Dense",
+          "config": {
+            "units": 64,
+            "activation": "relu",
+            "input_shape": [null, 8]
+          }
+        },
+        {
+          "class_name": "Dense", 
+          "config": {
+            "units": 32,
+            "activation": "relu"
+          }
+        },
+        {
+          "class_name": "Dense",
+          "config": {
+            "units": 1,
+            "activation": "sigmoid"
+          }
+        }
+      ]
+    }
+  },
+  "weightsManifest": [
+    {
+      "paths": ["group1-shard1of1.bin"],
+      "weights": [
+        {"name": "dense/kernel", "shape": [8, 64], "dtype": "float32"},
+        {"name": "dense/bias", "shape": [64], "dtype": "float32"},
+        {"name": "dense_1/kernel", "shape": [64, 32], "dtype": "float32"},
+        {"name": "dense_1/bias", "shape": [32], "dtype": "float32"},
+        {"name": "dense_2/kernel", "shape": [32, 1], "dtype": "float32"},
+        {"name": "dense_2/bias", "shape": [1], "dtype": "float32"}
+      ]
+    }
+  ]
+}

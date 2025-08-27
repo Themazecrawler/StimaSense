@@ -1,0 +1,83 @@
+{
+  "expo": {
+    "name": "StimaSense",
+    "slug": "stimasense",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#EF6850"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.stimasense.app",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "StimaSense needs location access to provide accurate power outage predictions for your area.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "StimaSense needs location access to monitor power grid conditions and send alerts for your area.",
+        "NSCameraUsageDescription": "StimaSense needs camera access to allow you to report outages with photos.",
+        "NSMicrophoneUsageDescription": "StimaSense may need microphone access for voice reports.",
+        "NSNotificationsUsageDescription": "StimaSense sends important power outage alerts and predictions."
+      },
+      "config": {
+        "googleMapsApiKey": "YOUR_GOOGLE_MAPS_IOS_API_KEY"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#EF6850"
+      },
+      "package": "com.stimasense.app",
+      "versionCode": 1,
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "CAMERA",
+        "RECORD_AUDIO",
+        "NOTIFICATIONS",
+        "INTERNET",
+        "ACCESS_NETWORK_STATE",
+        "VIBRATE"
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "YOUR_GOOGLE_MAPS_ANDROID_API_KEY"
+        }
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-location",
+      "expo-camera",
+      "expo-notifications",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 34,
+            "targetSdkVersion": 34,
+            "buildToolsVersion": "34.0.0"
+          },
+          "ios": {
+            "deploymentTarget": "13.0"
+          }
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "your-eas-project-id"
+      }
+    }
+  }
+}
