@@ -1,11 +1,155 @@
 [
   {
-    "id": "sample-1",
-    "region": "Nairobi County",
-    "area": "Kilimani, Hurlingham, parts of Kileleshwa",
-    "startTime": "2025-08-21T09:00:00+03:00",
-    "endTime": "2025-08-21T17:00:00+03:00",
+    "id": "Kenya Power PLC Close menu Home About Us Who We Are Board of Directors Senior Management Regional Managers Corporate Str",
+    "region": "Grid Solar Access Project (KOSAP) Kenya eCooking Market Development Project (KEMDP)",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
     "sourceUrl": "https://kplc.co.ke/customer-support#powerschedule",
-    "createdAt": "2025-08-20T14:57:00+03:00"
+    "createdAt": "2025-08-28T01:07:49.507451Z"
+  },
+  {
+    "id": "Customer Service We aim to support our valued customers with the successful integration of the Integrated Customer Manag",
+    "region": "service portal *977# The mypower app How to query your power bill via the self",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-08-28T01:07:49.517943Z"
+  },
+  {
+    "id": "Power Maintenance Schedule Aug 20, 2025 14:57 pm Power Maintenance Notice - 21.08.2025 Power Maintenance Notice - 21.08.",
+    "region": "21.08.2025 Power Maintenance Notice",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-08-28T01:07:49.538832Z"
+  },
+  {
+    "id": "Aug 20, 2025 14:57 pm Power Maintenance Notice - 21.08.2025 Power Maintenance Notice - 21.08.2025 Aug 14, 2025 14:45 pm ",
+    "region": "21.08.2025 Power Maintenance Notice",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-08-28T01:07:49.539464Z"
+  },
+  {
+    "id": "Aug 20, 2025 14:57 pm Power Maintenance Notice - 21.08.2025 Power Maintenance Notice - 21.08.2025",
+    "region": "21.08.2025 Power Maintenance Notice",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-08-28T01:07:49.539509Z"
+  },
+  {
+    "id": "Power Maintenance Notice - 21.08.2025",
+    "region": "21.08.2025",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-08-28T01:07:49.539556Z"
+  },
+  {
+    "id": "Aug 14, 2025 14:45 pm Power Maintenance Notice - 14.08.2025 Power Maintenance Notice - 14.08.2025",
+    "region": "14.08.2025 Power Maintenance Notice",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-08-28T01:07:49.539582Z"
+  },
+  {
+    "id": "Power Maintenance Notice - 14.08.2025",
+    "region": "14.08.2025",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-08-28T01:07:49.539626Z"
+  },
+  {
+    "id": "Aug 08, 2025 09:57 am Power Maintenance Notice - 07.08.2025 Power Maintenance Notice - 07.08.2025",
+    "region": "07.08.2025 Power Maintenance Notice",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-08-28T01:07:49.539648Z"
+  },
+  {
+    "id": "Power Maintenance Notice - 07.08.2025",
+    "region": "07.08.2025",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-08-28T01:07:49.539692Z"
+  },
+  {
+    "id": "Jul 31, 2025 13:43 pm Power Maintenance Notice View Details",
+    "region": "",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-08-28T01:07:49.539712Z"
+  },
+  {
+    "id": "Power Maintenance Notice",
+    "region": "",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-08-28T01:07:49.539751Z"
+  },
+  {
+    "id": "Jul 24, 2025 17:13 pm Power Maintenance Notice View Details",
+    "region": "",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-08-28T01:07:49.539770Z"
+  },
+  {
+    "id": "Jul 21, 2025 10:07 am Power Maintenance Notice View Details",
+    "region": "",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-08-28T01:07:49.539826Z"
+  },
+  {
+    "id": "Jul 12, 2025 15:10 pm SPECIAL POWER SUPPLY INTERRUPTION NOTICE SPECIAL POWER SUPPLY INTERRUPTION NOTICE",
+    "region": "",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-08-28T01:07:49.539885Z"
+  },
+  {
+    "id": "SPECIAL POWER SUPPLY INTERRUPTION NOTICE",
+    "region": "",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-08-28T01:07:49.539929Z"
+  },
+  {
+    "id": "Jul 10, 2025 10:00 am Power Maintenance Notice View Details",
+    "region": "",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-08-28T01:07:49.539948Z"
   }
 ]
