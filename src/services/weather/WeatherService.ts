@@ -1,5 +1,17 @@
 import Geolocation from '@react-native-community/geolocation';
-import { PermissionsAndroid, Platform } from 'react-native';
+
+interface GeolocationResponse {
+  coords: {
+    latitude: number;
+    longitude: number;
+    accuracy: number;
+    altitude: number | null;
+    altitudeAccuracy: number | null;
+    heading: number | null;
+    speed: number | null;
+  };
+  timestamp: number;
+}
 
 export interface WeatherData {
   temperature: number;
@@ -194,31 +206,14 @@ class WeatherService {
   // Private methods
   private async getUserLocation(): Promise<{ latitude: number; longitude: number } | null> {
     try {
-      // Request permissions on Android; iOS handled by Geolocation.requestAuthorization
-      if (Platform.OS === 'android') {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-        );
-        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-          console.warn('Location permission denied');
-          return null;
-        }
-      } else {
-        if (typeof (Geolocation as any).requestAuthorization === 'function') {
-          (Geolocation as any).requestAuthorization();
-        }
-      }
-      const granted = true;
-      if (!granted) {
-        console.warn('Location permission denied');
-        return null;
-      }
-
-      const location = await new Promise<any>((resolve, reject) => {
+      // For React Native, we'll use a simpler approach
+      // In a real app, you might want to use react-native-permissions for proper permission handling
+      
+      const location = await new Promise<GeolocationResponse>((resolve, reject) => {
         Geolocation.getCurrentPosition(
-          pos => resolve(pos),
-          err => reject(err),
-          { enableHighAccuracy: false, timeout: 15000, maximumAge: 10000 }
+          (position) => resolve(position),
+          (error) => reject(error),
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
         );
       });
 
