@@ -5,8 +5,10 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  SafeAreaView,
+  Linking,
+  Alert,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Feather';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Card, CardContent, CardHeader } from '../ui/Card';
@@ -143,6 +145,22 @@ export function AlertsScreen({ onNavigate }: AlertsScreenProps) {
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [activeTab, setActiveTab] = useState('active');
+
+  const handleCall = (phoneNumber: string) => {
+    const url = `tel:${phoneNumber}`;
+    Linking.canOpenURL(url)
+      .then((supported) => {
+        if (supported) {
+          return Linking.openURL(url);
+        } else {
+          Alert.alert('Error', 'Phone calls are not supported on this device');
+        }
+      })
+      .catch((err) => {
+        console.error('Error making phone call:', err);
+        Alert.alert('Error', 'Unable to make phone call');
+      });
+  };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
@@ -658,8 +676,17 @@ export function AlertsScreen({ onNavigate }: AlertsScreenProps) {
                       </View>
                     </View>
                     <View style={styles.actionButtons}>
-                      <Button title="Call" variant="outline" size="sm" onPress={() => {}} />
-                      <Button title="" variant="ghost" size="sm" onPress={() => {}} />
+                      <Button title="Call" variant="outline" size="sm" onPress={() => handleCall(contact.phone)} />
+                      <TouchableOpacity
+                        style={{
+                          padding: 8,
+                          borderRadius: 6,
+                          backgroundColor: colors.muted + '40'
+                        }}
+                        onPress={() => {}}
+                      >
+                        <Icon name="more-horizontal" size={16} color={colors.foreground} />
+                      </TouchableOpacity>
                     </View>
                   </View>
                 ))}

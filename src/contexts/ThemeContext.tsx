@@ -234,8 +234,21 @@ export const ThemeUtils = {
    */
   getContrastColor: (backgroundColor: string): string => {
     // Simple contrast calculation - in production, use a proper contrast ratio calculation
-    const isDark = backgroundColor.toLowerCase().includes('#');
-    return isDark ? '#ffffff' : '#000000';
+    if (!backgroundColor || backgroundColor === 'transparent') {
+      return '#000000';
+    }
+    
+    // Check if it's a dark color by examining the hex value
+    const hex = backgroundColor.replace('#', '');
+    if (hex.length === 6) {
+      const r = parseInt(hex.substring(0, 2), 16);
+      const g = parseInt(hex.substring(2, 4), 16);
+      const b = parseInt(hex.substring(4, 6), 16);
+      const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+      return brightness > 128 ? '#000000' : '#ffffff';
+    }
+    
+    return '#000000';
   },
 
   /**
@@ -265,9 +278,9 @@ export const ThemeUtils = {
     if (opacity < 1) {
       // Convert hex to rgba (simplified)
       const hex = color.replace('#', '');
-      const r = parseInt(hex.substr(0, 2), 16);
-      const g = parseInt(hex.substr(2, 2), 16);
-      const b = parseInt(hex.substr(4, 2), 16);
+      const r = parseInt(hex.substring(0, 2), 16);
+      const g = parseInt(hex.substring(2, 4), 16);
+      const b = parseInt(hex.substring(4, 6), 16);
       return `rgba(${r}, ${g}, ${b}, ${opacity})`;
     }
     

@@ -4,17 +4,17 @@ import { useTheme } from '../../contexts/ThemeContext';
 
 interface CardProps {
   children: React.ReactNode;
-  style?: ViewStyle | ViewStyle[];
+  style?: ViewStyle;
 }
 
 interface CardContentProps {
   children: React.ReactNode;
-  style?: ViewStyle | ViewStyle[];
+  style?: ViewStyle;
 }
 
 interface CardHeaderProps {
   children: React.ReactNode;
-  style?: ViewStyle | ViewStyle[];
+  style?: ViewStyle;
 }
 
 export function Card({ children, style }: CardProps) {
