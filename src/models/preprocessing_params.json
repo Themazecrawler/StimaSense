@@ -1,25 +1,68 @@
 {
-  "weather_scaler": {
-    "type": "RobustScaler",
-    "parameters": {
-      "temperature": {"median": 25.0, "scale": 10.0},
-      "humidity": {"median": 60.0, "scale": 20.0},
-      "wind_speed": {"median": 15.0, "scale": 8.0},
-      "pressure": {"median": 1013.0, "scale": 15.0},
-      "visibility": {"median": 10.0, "scale": 5.0}
+  "weather_scaler": [
+    {
+      "median": 0.0,
+      "scale": 1e-09
+    },
+    {
+      "median": 0.0,
+      "scale": 1e-09
+    },
+    {
+      "median": 0.0,
+      "scale": 1e-09
+    },
+    {
+      "median": 0.0,
+      "scale": 1e-09
+    },
+    {
+      "median": 0.0,
+      "scale": 1e-09
+    },
+    {
+      "median": 0.0,
+      "scale": 1e-09
+    },
+    {
+      "median": 0.0,
+      "scale": 1e-09
+    },
+    {
+      "median": 0.0,
+      "scale": 1e-09
     }
-  },
-  "temporal_scaler": {
-    "type": "MinMaxScaler",
-    "parameters": {
-      "hour": {"min": 0, "max": 23},
-      "day_of_week": {"min": 0, "max": 6},
-      "month": {"min": 1, "max": 12},
-      "is_weekend": {"min": 0, "max": 1}
+  ],
+  "grid_scaler": [
+    {
+      "mean": 0.0,
+      "std": 1e-09
+    },
+    {
+      "mean": 0.0,
+      "std": 1e-09
+    },
+    {
+      "mean": 0.0,
+      "std": 1e-09
+    },
+    {
+      "mean": 0.0,
+      "std": 1e-09
+    },
+    {
+      "mean": 0.0,
+      "std": 1e-09
+    },
+    {
+      "mean": 0.0,
+      "std": 1e-09
     }
-  },
-  "feature_names": [
-    "temperature", "humidity", "wind_speed", "pressure", "visibility",
-    "hour", "day_of_week", "month", "is_weekend"
+  ],
+  "sequence_scaler": [
+    {
+      "mean": 0.0,
+      "std": 1.0
+    }
   ]
 }

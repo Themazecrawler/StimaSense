@@ -2,7 +2,7 @@
   "model_info": {
     "name": "StimaSense Outage Predictor",
     "version": "1.0.0",
-    "created_date": "2025-08-25T16:00:57.337292Z",
+    "created_date": "2025-08-27T17:51:40.339595Z",
     "framework": "TensorFlow",
     "model_type": "Hybrid Neural Network"
   },
