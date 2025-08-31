@@ -30,11 +30,11 @@ import { ReportOutageScreen } from './src/components/screens/ReportOutageScreen'
 import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
 
 // Import services
-import { mlService } from './src/services/ml/MLService';
-import { federatedLearningService } from './src/services/ml/FederatedLearningService';
-import { modelFeedbackService } from './src/services/ml/ModelFeedbackService';
-import { autoPredictionService } from './src/services/ml/AutoPredictionService';
-import { backgroundTaskService } from './src/services/background/BackgroundTaskService';
+import { mlService } from './services/ml/MLService';
+import { federatedLearningService } from './services/ml/FederatedLearningService';
+import { modelFeedbackService } from './services/ml/ModelFeedbackService';
+import { autoPredictionService } from './services/ml/AutoPredictionService';
+import { backgroundTaskService } from './src/backend/background/BackgroundTaskService';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
