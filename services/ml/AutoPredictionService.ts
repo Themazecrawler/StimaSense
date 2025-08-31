@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // TODO: replace with @react-native-community/geolocation
 // import Geolocation from '@react-native-community/geolocation';
 import { mlService } from './MLService';
-import { weatherService } from '../weather/WeatherService';
+import { weatherService } from '../../src/backend/weather/WeatherService';
 
 import { federatedLearningService } from './FederatedLearningService';
 
@@ -140,7 +140,7 @@ class AutoPredictionService {
       
       // Create live prediction object
       const livePrediction: LivePrediction = {
-        id: `auto_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        id: `auto_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
         timestamp: new Date(),
         location,
         prediction: {

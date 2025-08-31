@@ -33,8 +33,8 @@ export class TensorFlowMLService {
         this.model = await tf.loadLayersModel('http://localhost:8081/models/outage_prediction_model/model.json');
       } else {
         const modelHandler = bundleResourceIO(
-          require('../../models/outage_prediction_model/model.json'),
-          require('../../models/outage_prediction_model/group1-shard1of1.bin')
+          require('../../src/models/outage_prediction_model/model.json'),
+          require('../../src/models/outage_prediction_model/group1-shard1of1.bin')
         );
         // Use type assertion to resolve compatibility issues
         this.model = await tf.loadLayersModel(modelHandler as any);
@@ -43,11 +43,11 @@ export class TensorFlowMLService {
       // Load preprocessing parameters and metadata
       const preprocessingUrl = __DEV__
         ? 'http://localhost:8081/models/preprocessing_params.json'
-        : require('../../models/preprocessing_params.json');
+        : require('../../src/models/preprocessing_params.json');
         
       const metadataUrl = __DEV__
         ? 'http://localhost:8081/models/model_metadata.json'
-        : require('../../models/model_metadata.json');
+        : require('../../src/models/model_metadata.json');
         
       if (typeof preprocessingUrl === 'string') {
         const [preprocessingResponse, metadataResponse] = await Promise.all([

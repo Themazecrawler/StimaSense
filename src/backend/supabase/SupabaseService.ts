@@ -206,19 +206,20 @@ export class SupabaseService {
     }
   }
 
-  async getWeatherData(location: { lat: number; lng: number }, hours: number = 24): Promise<WeatherData[]> {
+  async getWeatherData(location: { lat: number; lng: number }, timeRange?: { start: string; end: string }): Promise<WeatherData[]> {
     try {
-      const cutoffTime = new Date();
-      cutoffTime.setHours(cutoffTime.getHours() - hours);
-
-      const { data, error } = await supabase
+      let query = supabase
         .from('weather_data')
         .select('*')
         .eq('location_lat', location.lat)
         .eq('location_lng', location.lng)
-        .gte('recorded_at', cutoffTime.toISOString())
         .order('recorded_at', { ascending: false });
 
+      if (timeRange) {
+        query = query.gte('recorded_at', timeRange.start).lte('recorded_at', timeRange.end);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       return data || [];
     } catch (error) {
@@ -228,7 +229,7 @@ export class SupabaseService {
   }
 
   // Predictions
-  async savePrediction(prediction: Omit<PredictionResult, 'id' | 'created_at'>): Promise<PredictionResult | null> {
+  async savePredictionResult(prediction: Omit<PredictionResult, 'id' | 'created_at'>): Promise<PredictionResult | null> {
     try {
       const { data, error } = await supabase
         .from('predictions')
@@ -239,51 +240,73 @@ export class SupabaseService {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error saving prediction:', error);
+      console.error('Error saving prediction result:', error);
       return null;
     }
   }
 
-  async getPredictions(userId: string, limit: number = 50): Promise<PredictionResult[] | null> {
+  async getPredictionHistory(userId?: string, limit: number = 50): Promise<PredictionResult[]> {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('predictions')
         .select('*')
-        .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(limit);
 
-      if (error) throw error;
-      return data || [];
-    } catch (error) {
-      console.error('Error getting predictions:', error);
-      return null;
-    }
-  }
-
-  // KPLC planned outages
-  async getKPLCPlannedOutages(region?: string): Promise<KPLCPlannedOutage[]> {
-    try {
-      let query = supabase
-        .from('kplc_planned_outages')
-        .select('*')
-        .eq('status', 'scheduled')
-        .order('start_time', { ascending: true });
-
-      if (region) {
-        query = query.eq('region', region);
+      if (userId) {
+        query = query.eq('user_id', userId);
       }
 
       const { data, error } = await query;
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error getting KPLC planned outages:', error);
+      console.error('Error getting prediction history:', error);
       return [];
     }
   }
 
-  // Model feedback
+  // KPLC Planned Outages
+  async saveKPLCOutages(outages: Omit<KPLCPlannedOutage, 'id' | 'created_at'>[]): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('kplc_planned_outages')
+        .upsert(outages, { onConflict: 'source_url,start_time' });
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error('Error saving KPLC outages:', error);
+      return false;
+    }
+  }
+
+  async getKPLCOutages(region?: string, activeOnly: boolean = true): Promise<KPLCPlannedOutage[]> {
+    try {
+      let query = supabase
+        .from('kplc_planned_outages')
+        .select('*')
+        .order('start_time', { ascending: true });
+
+      if (region) {
+        query = query.ilike('region', `%${region}%`);
+      }
+
+      if (activeOnly) {
+        const now = new Date().toISOString();
+        query = query.gte('end_time', now);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error getting KPLC outages:', error);
+      return [];
+    }
+  }
+
+  // Model Feedback
   async saveModelFeedback(feedback: Omit<ModelFeedback, 'id' | 'created_at'>): Promise<ModelFeedback | null> {
     try {
       const { data, error } = await supabase
@@ -300,14 +323,18 @@ export class SupabaseService {
     }
   }
 
-  async getModelFeedback(userId: string): Promise<ModelFeedback[]> {
+  async getModelFeedback(predictionId?: string): Promise<ModelFeedback[]> {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('model_feedback')
         .select('*')
-        .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
+      if (predictionId) {
+        query = query.eq('prediction_id', predictionId);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       return data || [];
     } catch (error) {
@@ -331,28 +358,14 @@ export class SupabaseService {
       .subscribe();
   }
 
-  // Utility methods
-  async uploadPhoto(file: File, bucket: string = 'outage-photos'): Promise<string | null> {
-    try {
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}`;
-      const { data, error } = await supabase.storage
-        .from(bucket)
-        .upload(fileName, file);
-
-      if (error) throw error;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from(bucket)
-        .getPublicUrl(fileName);
-
-      return publicUrl;
-    } catch (error) {
-      console.error('Error uploading photo:', error);
-      return null;
-    }
+  subscribeToPredictions(callback: (payload: any) => void) {
+    return supabase
+      .channel('predictions')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'predictions' }, callback)
+      .subscribe();
   }
 }
 
+// Export singleton instance
 export const supabaseService = new SupabaseService();
-
-
+export default supabaseService;

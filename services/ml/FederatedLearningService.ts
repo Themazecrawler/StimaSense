@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { mlService } from './MLService';
-import { weatherService } from '../weather/WeatherService';
+import { weatherService } from '../../src/backend/weather/WeatherService';
 
 
 export interface TrainingDataPoint {
@@ -86,7 +86,7 @@ class FederatedLearningService {
 
       // Create training data point
       const trainingPoint: TrainingDataPoint = {
-        id: `training_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        id: `training_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
         timestamp: new Date(),
         inputs: originalPrediction.input,
         actualOutcome,

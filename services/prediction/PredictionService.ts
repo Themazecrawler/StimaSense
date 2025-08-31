@@ -1,5 +1,5 @@
 import { mlService, OutagePredictionInput, OutagePredictionResult } from '../ml/MLService';
-import { weatherService, WeatherData } from '../weather/WeatherService';
+import { weatherService, WeatherData } from '../../src/backend/weather/WeatherService';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // TODO: replace with @react-native-community/geolocation

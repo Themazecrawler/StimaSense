@@ -381,7 +381,7 @@ class ModelFeedbackService {
     try {
       let userId = await AsyncStorage.getItem('user_id');
       if (!userId) {
-        userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        userId = `user_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
         await AsyncStorage.setItem('user_id', userId);
       }
       return userId;

@@ -104,5 +104,3 @@ class KPLCPlannedOutageService {
 }
 
 export const kplcPlannedOutageService = new KPLCPlannedOutageService();
-
-

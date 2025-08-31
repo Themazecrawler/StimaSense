@@ -1,7 +1,7 @@
 import { AppState, AppStateStatus } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { federatedLearningService } from '../ml/FederatedLearningService';
-import { modelFeedbackService } from '../ml/ModelFeedbackService';
+import { federatedLearningService } from '../../../services/ml/FederatedLearningService';
+import { modelFeedbackService } from '../../../services/ml/ModelFeedbackService';
 import { weatherService } from '../weather/WeatherService';
 
 
