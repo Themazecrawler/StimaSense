@@ -1,97 +1,387 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# StimaSense
 
-# Getting Started
+A React Native application for intelligent power outage prediction and monitoring using machine learning and real-time data analysis.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Overview
 
-## Step 1: Start Metro
+StimaSense is a comprehensive power monitoring solution that combines artificial intelligence with real-time data to predict and monitor power outages. The application provides users with personalized alerts, outage reporting capabilities, and detailed analytics to help manage power-related issues effectively.
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## Features
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+### Core Functionality
+- **AI-Powered Outage Prediction**: Machine learning models analyze weather, grid, and temporal data to predict potential power outages
+- **Real-Time Monitoring**: Continuous monitoring of power grid status and environmental conditions
+- **Personalized Alerts**: Location-based notifications for planned outages and predicted issues
+- **Outage Reporting**: Community-driven outage reporting system with detailed categorization
+- **Interactive Maps**: Visual representation of outage locations and affected areas
+- **Analytics Dashboard**: Comprehensive analytics and historical data visualization
 
-```sh
-# Using npm
-npm start
+### Technical Features
+- **TensorFlow.js Integration**: On-device machine learning for real-time predictions
+- **Supabase Backend**: Scalable cloud database and authentication system
+- **Location Services**: GPS-based location detection and reverse geocoding
+- **Push Notifications**: Real-time alerts for critical power events
+- **Offline Support**: Cached predictions and data for offline functionality
+- **Federated Learning**: Continuous model improvement through user feedback
 
-# OR using Yarn
-yarn start
+## Technology Stack
+
+### Frontend
+- **React Native**: Cross-platform mobile application framework
+- **TypeScript**: Type-safe JavaScript development
+- **React Navigation**: Navigation and routing system
+- **TensorFlow.js**: Machine learning framework for React Native
+- **React Native Vector Icons**: Icon library for UI components
+
+### Backend & Services
+- **Supabase**: Backend-as-a-Service for database, authentication, and storage
+- **PostgreSQL**: Primary database for user data and outage records
+- **Supabase Storage**: File storage for ML models and data files
+- **React Native Geolocation**: Location services and GPS integration
+
+### Machine Learning
+- **TensorFlow.js**: Neural network framework for outage prediction
+- **Custom ML Models**: Trained models for weather, grid, and temporal analysis
+- **Federated Learning**: Distributed learning system for model improvement
+- **Auto Prediction Service**: Automated prediction generation and updates
+
+### Development Tools
+- **Metro Bundler**: JavaScript bundler for React Native
+- **Android SDK**: Android development tools and emulator
+- **Gradle**: Build system for Android applications
+- **TypeScript Compiler**: Type checking and compilation
+
+## Installation
+
+### Prerequisites
+- Node.js (v16 or higher)
+- Java Development Kit (JDK 17)
+- Android Studio with Android SDK
+- React Native CLI
+- Physical Android device or emulator
+
+### Environment Setup
+
+1. **Install Node.js and npm**
+   ```bash
+   # Download and install Node.js from https://nodejs.org/
+   ```
+
+2. **Install Java Development Kit**
+   ```bash
+   # Download JDK 17 from Oracle or use OpenJDK
+   # Set JAVA_HOME environment variable
+   ```
+
+3. **Install Android Studio and SDK**
+   ```bash
+   # Download Android Studio from https://developer.android.com/
+   # Install Android SDK Platform-Tools
+   # Set ANDROID_HOME environment variable
+   ```
+
+4. **Install React Native CLI**
+   ```bash
+   npm install -g @react-native-community/cli
+   ```
+
+### Project Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd StimaSense
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Configure environment variables**
+   ```bash
+   # Create .env file with your Supabase credentials
+   SUPABASE_URL=your_supabase_url
+   SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
+
+4. **Configure Android settings**
+   ```bash
+   # Add Google Maps API key to android/app/src/main/AndroidManifest.xml
+   # Configure adb for device connection
+   ```
+
+## Configuration
+
+### Supabase Setup
+1. Create a Supabase project at https://supabase.com
+2. Set up database tables for users, outages, and predictions
+3. Configure authentication providers (email, Google OAuth)
+4. Set up storage buckets for ML models and data files
+5. Configure row-level security policies
+
+### Google Maps API
+1. Create a Google Cloud project
+2. Enable Maps SDK for Android
+3. Generate API key and add to AndroidManifest.xml
+4. Configure API key restrictions for security
+
+### ML Model Configuration
+1. Upload trained TensorFlow.js models to Supabase Storage
+2. Ensure model.json and weight files are in the same directory
+3. Configure model URLs in src/config/model.ts
+4. Test model loading and prediction functionality
+
+## Usage
+
+### Running the Application
+
+1. **Start Metro bundler**
+   ```bash
+   npx react-native start --reset-cache --port 8081
+   ```
+
+2. **Run on Android device**
+   ```bash
+   npx react-native run-android
+   ```
+
+3. **Enable USB debugging on device**
+   - Go to Settings > Developer options
+   - Enable USB debugging
+   - Connect device via USB
+
+### Development Workflow
+
+1. **Code changes**: Edit TypeScript/JavaScript files
+2. **Hot reload**: Changes automatically reflect in the app
+3. **Debugging**: Use React Native Debugger or Chrome DevTools
+4. **Testing**: Run tests with `npm test`
+
+## Project Structure
+
+```
+StimaSense/
+├── android/                 # Android-specific configuration
+├── ios/                     # iOS-specific configuration (if applicable)
+├── src/
+│   ├── components/         # React components
+│   │   ├── auth/           # Authentication screens
+│   │   ├── onboarding/     # Onboarding flow
+│   │   ├── screens/        # Main application screens
+│   │   └── ui/             # Reusable UI components
+│   ├── contexts/          # React contexts (theme, auth)
+│   ├── backend/           # Backend services
+│   │   ├── supabase/      # Supabase configuration
+│   │   ├── kplc/          # KPLC outage service
+│   │   └── background/   # Background task services
+│   ├── services/          # Business logic services
+│   │   └── ml/            # Machine learning services
+│   ├── utils/             # Utility functions
+│   ├── config/            # Configuration files
+│   └── models/            # ML model files
+├── services/              # Core services
+│   └── ml/                # ML service implementations
+├── App.tsx                # Main application component
+├── index.js               # Application entry point
+└── package.json           # Dependencies and scripts
 ```
 
-## Step 2: Build and run your app
+## Machine Learning Architecture
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+### Model Structure
+- **Multi-input Neural Network**: Processes weather, grid, temporal, and sequence data
+- **Input Features**:
+  - Weather features (temperature, humidity, wind speed, pressure, visibility)
+  - Grid features (load, capacity, reliability, voltage, frequency)
+  - Temporal features (hour, day of week, month, weekend flag)
+  - Sequence features (24 timesteps of historical data)
 
-### Android
+### Prediction Pipeline
+1. **Data Collection**: Gather real-time weather and grid data
+2. **Feature Engineering**: Process and normalize input features
+3. **Model Inference**: Run TensorFlow.js model predictions
+4. **Post-processing**: Convert predictions to risk levels and time windows
+5. **Alert Generation**: Create personalized notifications based on predictions
 
-```sh
-# Using npm
-npm run android
+### Federated Learning
+- **Local Training**: User devices contribute to model improvement
+- **Privacy-Preserving**: Training data never leaves the device
+- **Continuous Learning**: Models improve over time with user feedback
+- **Aggregation**: Central server aggregates model updates
 
-# OR using Yarn
-yarn android
+## API Reference
+
+### Core Services
+
+#### MLService
+```typescript
+interface MLService {
+  initializeModel(): Promise<boolean>;
+  predictOutage(input: OutagePredictionInput): Promise<ModelOutputs>;
+  getModelStatus(): ModelStatus;
+}
 ```
 
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
+#### AutoPredictionService
+```typescript
+interface AutoPredictionService {
+  startAutoPredictions(): Promise<void>;
+  getCurrentPrediction(): LivePrediction | null;
+  forceUpdate(): Promise<void>;
+  getStatus(): AutoPredictionStatus;
+}
 ```
 
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
+#### KPLCPlannedOutageService
+```typescript
+interface KPLCPlannedOutageService {
+  initialize(url?: string): Promise<void>;
+  filterForUserArea(area: string): PlannedOutage[];
+  setUserArea(area: string): void;
+  getOutages(): PlannedOutage[];
+}
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+### Data Models
 
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
+#### LivePrediction
+```typescript
+interface LivePrediction {
+  id: string;
+  timestamp: Date;
+  location: { latitude: number; longitude: number; address?: string };
+  prediction: {
+    riskLevel: 'low' | 'medium' | 'high' | 'critical';
+    probability: number;
+    confidence: number;
+    timeWindow: string;
+    factors: { weather: number; grid: number; historical: number };
+  };
+  environmentalData: EnvironmentalData;
+  recommendations: string[];
+  nextUpdateAt: Date;
+  modelVersion: string;
+}
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+#### OutageReport
+```typescript
+interface OutageReport {
+  id: string;
+  userId: string;
+  location: { latitude: number; longitude: number; address: string };
+  outageType: 'planned' | 'unplanned' | 'maintenance';
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  description: string;
+  estimatedDuration: number;
+  timestamp: Date;
+  status: 'active' | 'resolved' | 'pending';
+}
+```
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+## Deployment
 
-## Step 3: Modify your app
+### Production Build
+1. **Generate signed APK**
+   ```bash
+   cd android
+   ./gradlew assembleRelease
+   ```
 
-Now that you have successfully run the app, let's make changes!
+2. **Configure ProGuard** (optional)
+   - Enable code obfuscation
+   - Optimize bundle size
+   - Protect sensitive code
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+3. **Test thoroughly**
+   - Test on multiple devices
+   - Verify all features work correctly
+   - Check performance and memory usage
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+### App Store Deployment
+1. **Create developer account**
+2. **Prepare store listing**
+3. **Submit for review**
+4. **Monitor analytics and feedback**
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+## Troubleshooting
 
-## Congratulations! :tada:
+### Common Issues
 
-You've successfully run and modified your React Native App. :partying_face:
+#### Metro Bundler Issues
+```bash
+# Clear Metro cache
+npx react-native start --reset-cache
 
-### Now what?
+# Kill existing processes
+taskkill /f /im node.exe
+```
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+#### Android Build Issues
+```bash
+# Clean Android build
+cd android && ./gradlew clean
 
-# Troubleshooting
+# Check Java version
+java -version
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+# Verify environment variables
+echo $JAVA_HOME
+echo $ANDROID_HOME
+```
 
-# Learn More
+#### TensorFlow.js Issues
+```bash
+# Check model loading
+# Verify model files exist in Supabase Storage
+# Check network connectivity
+# Review console logs for detailed error messages
+```
 
-To learn more about React Native, take a look at the following resources:
+#### Location Services Issues
+```bash
+# Check permissions
+# Verify GPS is enabled
+# Test with different location providers
+# Review timeout settings
+```
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+### Debug Mode
+- Enable React Native Debugger
+- Use Chrome DevTools for debugging
+- Monitor console logs for errors
+- Check network requests in Network tab
+
+## Contributing
+
+### Development Guidelines
+1. **Code Style**: Follow TypeScript best practices
+2. **Testing**: Write unit tests for new features
+3. **Documentation**: Update documentation for API changes
+4. **Code Review**: Submit pull requests for review
+
+### Branch Strategy
+- `main`: Production-ready code
+- `develop`: Development branch
+- `feature/*`: Feature development branches
+- `hotfix/*`: Critical bug fixes
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Support
+
+For support and questions:
+- Create an issue in the GitHub repository
+- Check the troubleshooting section
+- Review the documentation
+- Contact the development team
+
+## Acknowledgments
+
+- React Native community for the excellent framework
+- Supabase team for the powerful backend platform
+- TensorFlow.js team for the ML framework
+- All contributors and beta testers

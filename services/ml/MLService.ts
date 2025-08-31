@@ -53,7 +53,7 @@ class MLService {
       console.log('Loading ML model...');
       
       // Use the TensorFlowMLService to load the actual model
-      const success = await tensorflowMLService.initializeModel();
+      const success = await tensorflowMLService.loadModel();
       
       if (success) {
         this.modelLoaded = true;
@@ -67,7 +67,12 @@ class MLService {
         throw new Error('Failed to initialize TensorFlowMLService');
       }
     } catch (error) {
-      console.error('Failed to load ML model:', error);
+      console.error('❌ Failed to load ML model:', error);
+      console.error('Error details:', {
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        name: error instanceof Error ? error.name : 'Unknown'
+      });
       this.modelLoaded = false;
       return false;
     }
@@ -78,17 +83,43 @@ class MLService {
    */
   async predictOutage(input: OutagePredictionInput): Promise<OutagePredictionResult> {
     if (!this.modelLoaded) {
-      await this.initializeModel();
+      console.log('🔄 Model not loaded, attempting to initialize...');
+      const initialized = await this.initializeModel();
+      if (!initialized) {
+        console.error('❌ Failed to initialize model for prediction');
+        throw new Error('Model not loaded and initialization failed');
+      }
     }
 
     try {
+      console.log('🎯 Making prediction with input:', {
+        temperature: input.temperature,
+        humidity: input.humidity,
+        windSpeed: input.windSpeed,
+        precipitation: input.precipitation,
+        timeOfDay: input.timeOfDay,
+        dayOfWeek: input.dayOfWeek
+      });
+      
       // Use TensorFlowMLService for actual predictions
       const weatherFeatures = [
         input.temperature,
         input.humidity,
         input.windSpeed,
         input.precipitation, // Use as pressure proxy
-        10.0 // Default visibility
+        10.0, // Default visibility
+        0.5, // Default cloud cover
+        0.3, // Default air quality
+        0.2  // Default solar radiation
+      ];
+      
+      const gridFeatures = [
+        input.gridLoad,
+        0.8, // Default grid capacity
+        0.9, // Default grid reliability
+        0.5, // Default voltage stability
+        0.7, // Default frequency stability
+        0.6  // Default load factor
       ];
       
       const temporalFeatures = [
@@ -98,10 +129,26 @@ class MLService {
         input.dayOfWeek === 0 || input.dayOfWeek === 6 ? 1 : 0 // Weekend flag
       ];
       
+      // Create sequence features (24 timesteps x 14 features) - historical data
+      const sequenceFeatures = Array(24).fill(0).map(() => 
+        Array(14).fill(0).map(() => Math.random() * 0.5) // Random historical data
+      );
+      
+      console.log('📊 Features prepared:', { 
+        weatherFeatures: weatherFeatures.length,
+        gridFeatures: gridFeatures.length,
+        temporalFeatures: temporalFeatures.length,
+        sequenceFeatures: sequenceFeatures.length
+      });
+      
       const prediction = await tensorflowMLService.predict({
         weatherFeatures,
-        temporalFeatures
+        gridFeatures,
+        temporalFeatures,
+        sequenceFeatures
       });
+      
+      console.log('✅ Raw prediction from TensorFlow:', prediction);
       
       // Convert TensorFlowMLService output to MLService format
       const result: OutagePredictionResult = {
@@ -117,12 +164,19 @@ class MLService {
         recommendations: this.generateRecommendations(prediction.riskLevel, input)
       };
       
+      console.log('✅ Final prediction result:', result);
+      
       // Log prediction for debugging
       await this.logPrediction(input, result);
       
       return result;
     } catch (error) {
-      console.error('Prediction failed:', error);
+      console.error('❌ Prediction failed:', error);
+      console.error('Error details:', {
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        name: error instanceof Error ? error.name : 'Unknown'
+      });
       throw new Error('Failed to generate outage prediction');
     }
   }

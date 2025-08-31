@@ -15,7 +15,7 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { Button } from '../ui/Button';
 import { Card, CardContent, CardHeader } from '../ui/Card';
 import { Input } from '../ui/Input';
-import { supabase } from '../../services/supabase/SupabaseService';
+import { supabase } from '../../backend/supabase/SupabaseService';
 
 export function RegisterScreen() {
   const navigation = useNavigation();
@@ -265,6 +265,20 @@ export function RegisterScreen() {
       color: colors.emergencyPrimary,
       fontWeight: '500',
     },
+    googleIconContainer: {
+      width: 20,
+      height: 20,
+      borderRadius: 10,
+      backgroundColor: '#4285F4', // Google's official blue color
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: 8,
+    },
+    googleIcon: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: '#ffffff',
+    },
   });
 
   return (
@@ -294,7 +308,9 @@ export function RegisterScreen() {
               onPress={handleGoogleRegister}
               activeOpacity={0.7}
             >
-              <Icon name="chrome" size={20} color={colors.foreground} />
+              <View style={styles.googleIconContainer}>
+                <Text style={styles.googleIcon}>G</Text>
+              </View>
               <Text style={styles.googleButtonText}>Sign up with Google</Text>
             </TouchableOpacity>
 

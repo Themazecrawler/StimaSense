@@ -15,7 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Button } from '../ui/Button';
 import { Card, CardContent, CardHeader } from '../ui/Card';
-import { supabase } from '../../services/supabase/SupabaseService';
+import { supabase } from '../../backend/supabase/SupabaseService';
 
 export function LoginScreen() {
   const navigation = useNavigation();
@@ -73,6 +73,25 @@ export function LoginScreen() {
       console.error('Google login error:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    try {
+      if (!email) {
+        Alert.alert('Forgot Password', 'Enter your email above, then tap Forgot password again.');
+        return;
+      }
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: 'stimasense://auth/callback',
+      });
+      if (error) {
+        Alert.alert('Reset Failed', error.message);
+      } else {
+        Alert.alert('Check your email', 'We sent a password reset link.');
+      }
+    } catch (e: any) {
+      Alert.alert('Reset Failed', e?.message || 'Unexpected error');
     }
   };
 
@@ -225,6 +244,20 @@ export function LoginScreen() {
       color: colors.emergencyPrimary,
       fontWeight: '500',
     },
+    googleIconContainer: {
+      width: 20,
+      height: 20,
+      borderRadius: 10,
+      backgroundColor: '#4285F4', // Google's official blue color
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: 8,
+    },
+    googleIcon: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: '#ffffff',
+    },
   });
 
   return (
@@ -238,7 +271,7 @@ export function LoginScreen() {
           >
             <Icon name="zap" size={40} color="#ffffff" />
           </LinearGradient>
-          <Text style={styles.logoText}>PowerAlert</Text>
+          <Text style={styles.logoText}>StimaSense</Text>
           <Text style={styles.logoSubtext}>Stay ahead of power outages</Text>
         </View>
 
@@ -254,7 +287,9 @@ export function LoginScreen() {
               onPress={handleGoogleLogin}
               activeOpacity={0.7}
             >
-              <Icon name="chrome" size={20} color={colors.foreground} />
+              <View style={styles.googleIconContainer}>
+                <Text style={styles.googleIcon}>G</Text>
+              </View>
               <Text style={styles.googleButtonText}>Continue with Google</Text>
             </TouchableOpacity>
 
@@ -337,7 +372,7 @@ export function LoginScreen() {
             </LinearGradient>
 
             {/* Forgot Password */}
-            <TouchableOpacity style={styles.forgotPassword}>
+            <TouchableOpacity style={styles.forgotPassword} onPress={handleForgotPassword}>
               <Text style={styles.forgotPasswordText}>Forgot your password?</Text>
             </TouchableOpacity>
           </CardContent>

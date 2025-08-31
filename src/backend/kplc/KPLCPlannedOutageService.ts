@@ -18,6 +18,8 @@ class KPLCPlannedOutageService {
   private subscribers: Subscriber[] = [];
   private lastFetch: number = 0;
   private fetchIntervalMs = 12 * 60 * 60 * 1000; // every 12 hours
+  private lastNotifiedIds = new Set<string>();
+  private userAreaText: string = '';
 
   async initialize(remoteUrl?: string): Promise<void> {
     await this.refresh(remoteUrl);
@@ -25,6 +27,10 @@ class KPLCPlannedOutageService {
     setInterval(() => {
       this.refresh(remoteUrl).catch(() => {});
     }, this.fetchIntervalMs);
+  }
+
+  setUserArea(userAreaText: string) {
+    this.userAreaText = (userAreaText || '').trim();
   }
 
   subscribe(cb: Subscriber): () => void {
@@ -72,10 +78,18 @@ class KPLCPlannedOutageService {
       this.lastFetch = Date.now();
       this.subscribers.forEach(s => s(this.outages));
 
-      // Trigger notifications for new postings
+      // Trigger notifications for new postings (personalized by user area if available)
       if (newlyAdded.length > 0) {
-        for (const item of newlyAdded.slice(0, 5)) {
+        const filtered = this.userAreaText
+          ? newlyAdded.filter(o =>
+              (o.region || '').toLowerCase().includes(this.userAreaText.toLowerCase()) ||
+              (o.area || '').toLowerCase().includes(this.userAreaText.toLowerCase())
+            )
+          : newlyAdded;
+        for (const item of filtered.slice(0, 10)) {
+          if (this.lastNotifiedIds.has(item.id)) continue;
           await this.notifyNewOutage(item);
+          this.lastNotifiedIds.add(item.id);
         }
       }
     } catch (e) {
@@ -100,6 +114,16 @@ class KPLCPlannedOutageService {
     const start = startIso ? new Date(startIso).toLocaleString(undefined, opts) : 'TBA';
     const end = endIso ? new Date(endIso).toLocaleString(undefined, { hour: '2-digit', minute: '2-digit' }) : 'TBA';
     return `${start} - ${end}`;
+  }
+
+  // Filter outages by approximate user area text (e.g., "Nairobi West").
+  filterForUserArea(userAreaText: string): PlannedOutage[] {
+    const q = (userAreaText || '').toLowerCase();
+    if (!q) return [];
+    return this.outages.filter(o =>
+      (o.region || '').toLowerCase().includes(q) ||
+      (o.area || '').toLowerCase().includes(q)
+    );
   }
 }
 

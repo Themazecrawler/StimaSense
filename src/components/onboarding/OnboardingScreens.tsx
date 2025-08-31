@@ -94,7 +94,8 @@ export function OnboardingScreens() {
     try {
       await AsyncStorage.setItem('isOnboarded', 'true');
       await AsyncStorage.setItem('isAuthenticated', 'true');
-      // Navigation will be handled by the parent component
+      // Move user to the main app immediately
+      (navigation as any).reset({ index: 0, routes: [{ name: 'Main' }] });
     } catch (error) {
       console.error('Error completing onboarding:', error);
     }

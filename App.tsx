@@ -6,8 +6,10 @@ import {
   Platform,
   ActivityIndicator,
   Text,
+  Linking,
 } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -24,13 +26,18 @@ import { OnboardingScreens } from './src/components/onboarding/OnboardingScreens
 import { DashboardScreen } from './src/components/screens/DashboardScreen';
 import { MapScreen } from './src/components/screens/MapScreen';
 import { AnalyticsScreen } from './src/components/screens/AnalyticsScreen';
-import { ProfileScreen } from './src/components/screens/ProfileScreen';
-import { AlertsScreen } from './src/components/screens/AlertsScreen';
-import { ReportOutageScreen } from './src/components/screens/ReportOutageScreen';
+import ProfileScreen from './src/components/screens/ProfileScreen';
+import AlertsScreen from './src/components/screens/AlertsScreen';
+import ReportOutageScreen from './src/components/screens/ReportOutageScreen';
 import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
 
 // Import services
 import { mlService } from './services/ml/MLService';
+import { supabase } from './src/backend/supabase/SupabaseService';
+import { kplcPlannedOutageService } from './src/backend/kplc/KPLCPlannedOutageService';
+import { OUTAGES_URL } from './src/config/outages';
+import Geolocation from '@react-native-community/geolocation';
+import { reverseGeocodeToAreaText } from './src/utils/geocoding';
 import { federatedLearningService } from './services/ml/FederatedLearningService';
 import { modelFeedbackService } from './services/ml/ModelFeedbackService';
 import { autoPredictionService } from './services/ml/AutoPredictionService';
@@ -56,21 +63,7 @@ function MainTabNavigator() {
   const { colors } = useTheme();
   const navigation = useNavigation();
 
-  // Wrapper components to provide required props
-  const AlertsScreenWrapper = () => (
-    <AlertsScreen onNavigate={(screen) => navigation.navigate(screen as never)} />
-  );
-
-  const ProfileScreenWrapper = () => {
-    const { theme, toggleTheme } = useTheme();
-    return (
-      <ProfileScreen 
-        onNavigate={(screen) => navigation.navigate(screen as never)}
-        onToggleTheme={toggleTheme}
-        isDark={theme === 'dark'}
-      />
-    );
-  };
+  // No wrapper needed - screens handle their own navigation
 
   return (
     <Tab.Navigator
@@ -120,8 +113,8 @@ function MainTabNavigator() {
       <Tab.Screen name="Dashboard" component={DashboardScreen} />
       <Tab.Screen name="Map" component={MapScreen} />
       <Tab.Screen name="Analytics" component={AnalyticsScreen} />
-      <Tab.Screen name="Alerts" component={AlertsScreenWrapper} />
-      <Tab.Screen name="Profile" component={ProfileScreenWrapper} />
+      <Tab.Screen name="Alerts" component={AlertsScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );
 }
@@ -279,27 +272,46 @@ function AppNavigator() {
 
   const initializeTensorFlow = async () => {
     try {
-      console.log('🧠 Initializing TensorFlow.js...');
-      
-      // Import TensorFlow.js and wait for it to be ready
-      const tf = await import('@tensorflow/tfjs');
-      await tf.ready();
-      
-      console.log('✅ TensorFlow.js initialized successfully');
-      console.log('📊 TF Backend:', tf.getBackend());
-      
-      // Platform-specific optimizations
-      if (Platform.OS === 'ios') {
-        console.log('🍎 iOS optimizations applied');
-      } else if (Platform.OS === 'android') {
-        console.log('🤖 Android optimizations applied');
-      }
-      
+      console.log('🧠 TensorFlow.js will be initialized by ML services when needed...');
+      // TensorFlow.js initialization is now handled by TensorFlowMLService
+      // This prevents conflicts and ensures proper initialization order
     } catch (error) {
       console.warn('⚠️ TensorFlow.js initialization warning:', error);
       // Continue without TensorFlow.js - app will use fallback predictions
     }
   };
+
+  // Handle deep links for Supabase OAuth/Reset flows
+  useEffect(() => {
+    const handler = async (urlStr: string) => {
+      try {
+        if (!urlStr) return;
+        if (!urlStr.startsWith('stimasense://auth/callback')) return;
+        const url = new URL(urlStr);
+        const code = url.searchParams.get('code');
+        if (code) {
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          if (!error) {
+            await AsyncStorage.setItem('isAuthenticated', 'true');
+            setIsAuthenticated(true);
+            // Optional: mark onboarded to get past auth quickly
+            await AsyncStorage.setItem('isOnboarded', 'true');
+            setIsOnboarded(true);
+          }
+        }
+      } catch (e) {
+        console.warn('Deep link handling failed:', e);
+      }
+    };
+
+    const sub = Linking.addEventListener('url', (evt) => handler(evt.url));
+    // Handle app cold-start via deep link
+    Linking.getInitialURL().then((u) => { if (u) handler(u); });
+    return () => {
+      // @ts-ignore RN new API returns subscription object with remove()
+      sub?.remove?.();
+    };
+  }, []);
 
   const initializeMLServices = async () => {
     try {
@@ -310,13 +322,18 @@ function AppNavigator() {
       
       if (!mlInitialized) {
         console.warn('⚠️ ML model initialization failed - using fallback predictions');
+        // Set a flag to indicate fallback mode
+        await AsyncStorage.setItem('ml_fallback_mode', 'true');
       } else {
         console.log('✅ ML model initialized successfully');
         console.log('ml model ready for predictions');
+        await AsyncStorage.setItem('ml_fallback_mode', 'false');
       }
       
     } catch (error) {
       console.warn('⚠️ ML service initialization error:', error);
+      // Ensure fallback mode is enabled
+      await AsyncStorage.setItem('ml_fallback_mode', 'true');
     }
   };
 
@@ -376,6 +393,34 @@ function AppNavigator() {
         totalTasks: taskStatuses.length,
         enabledTasks: enabledTasks.length,
       });
+
+      // Initialize KPLC planned outages from remote JSON if provided
+      if (OUTAGES_URL) {
+        await kplcPlannedOutageService.initialize(OUTAGES_URL);
+      } else {
+        // fallback bundled JSON
+        await kplcPlannedOutageService.initialize();
+      }
+
+      // Attempt to personalize by device location
+      Geolocation.requestAuthorization?.();
+      Geolocation.getCurrentPosition(
+        async (pos) => {
+          const { latitude, longitude } = pos.coords;
+          const areaText = await reverseGeocodeToAreaText(latitude, longitude);
+          if (areaText) {
+            kplcPlannedOutageService.setUserArea(areaText);
+            const matches = kplcPlannedOutageService.filterForUserArea(areaText);
+            // Optionally, notify top N immediately on first launch
+            // (we rely on service new-items notifications later)
+            console.log('📍 User area resolved to:', areaText, 'matches:', matches.length);
+          }
+        },
+        (err) => {
+          console.log('Location unavailable:', err?.message || err);
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 },
+      );
       
     } catch (error) {
       console.warn('⚠️ Background services initialization error:', error);
@@ -418,11 +463,13 @@ function AppNavigator() {
 // Main App Component
 export default function App() {
   return (
-    <SafeAreaProvider>
-      <ThemeProvider>
-      <AppContent />
-      </ThemeProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <AppContent />
+        </ThemeProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
 

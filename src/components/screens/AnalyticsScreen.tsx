@@ -18,10 +18,10 @@ import { Badge } from '../ui/Badge';
 import { Progress } from '../ui/Progress';
 
 // Import services
-import { modelManagementService, ModelMetrics, TrainingSchedule, ModelVersion } from '../../services/ml/ModelManagementService';
-import { modelFeedbackService } from '../../services/ml/ModelFeedbackService';
-import { autoPredictionService } from '../../services/ml/AutoPredictionService';
-import { federatedLearningService } from '../../services/ml/FederatedLearningService';
+import { modelManagementService, ModelMetrics, TrainingSchedule, ModelVersion } from '../../../services/ml/ModelManagementService';
+import { modelFeedbackService } from '../../../services/ml/ModelFeedbackService';
+import { autoPredictionService, LivePrediction } from '../../../services/ml/AutoPredictionService';
+import { federatedLearningService } from '../../../services/ml/FederatedLearningService';
 
 const { width } = Dimensions.get('window');
 
@@ -63,7 +63,7 @@ export function AnalyticsScreen() {
       setTrainingStats(stats);
       
       // Process prediction statistics
-      const riskLevelCounts = predictionHistory.reduce((acc, pred) => {
+      const riskLevelCounts = predictionHistory.reduce((acc: Record<string, number>, pred: LivePrediction) => {
         acc[pred.prediction.riskLevel] = (acc[pred.prediction.riskLevel] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);

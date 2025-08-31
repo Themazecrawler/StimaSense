@@ -510,7 +510,31 @@ class FederatedLearningService {
    */
   async triggerManualRetraining(): Promise<RetrainingMetrics | null> {
     console.log('Manual retraining triggered');
-    return await this.retrainModel();
+    
+    try {
+      // Check if we have enough data
+      if (this.trainingData.length < this.minDataPointsForRetraining) {
+        console.warn(`Not enough training data. Need ${this.minDataPointsForRetraining}, have ${this.trainingData.length}`);
+        return null;
+      }
+      
+      // Ensure model is loaded before retraining
+      const { mlService } = require('./MLService');
+      if (!mlService.modelLoaded) {
+        console.log('Model not loaded, attempting to load first...');
+        const loaded = await mlService.initializeModel();
+        if (!loaded) {
+          console.error('Failed to load model for retraining');
+          return null;
+        }
+      }
+      
+      console.log(`Starting manual retraining with ${this.trainingData.length} data points`);
+      return await this.retrainModel();
+    } catch (error) {
+      console.error('Manual retraining failed:', error);
+      return null;
+    }
   }
 }
 

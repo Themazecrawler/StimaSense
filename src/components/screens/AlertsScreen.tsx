@@ -1,717 +1,578 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Linking,
-  Alert,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/Feather';
 import { useTheme } from '../../contexts/ThemeContext';
-import { Card, CardContent, CardHeader } from '../ui/Card';
-import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
-import { Switch } from '../ui/Switch';
+import { Separator } from '../ui/Separator';
+import { Avatar } from '../ui/Avatar';
+import { Progress } from '../ui/Progress';
 
-interface AlertsScreenProps {
-  onNavigate: (screen: string) => void;
+interface Alert {
+  id: string;
+  type: 'outage' | 'prediction' | 'weather' | 'maintenance';
+  title: string;
+  message: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  timestamp: Date;
+  location: string;
+  isRead: boolean;
+  estimatedDuration?: string;
+  affectedCustomers?: number;
 }
 
-const activeAlerts = [
-  {
-    id: 1,
-    type: 'outage',
-    severity: 'high',
-    title: 'Power Outage in Progress',
-    description: 'Affecting Downtown District - 1,200 customers without power',
-    location: 'Downtown District',
-    time: '2 hours ago',
-    duration: '2h 15m',
-    affected: 1200,
-    status: 'ongoing',
-    icon: 'zap'
-  },
-  {
-    id: 2,
-    type: 'weather',
-    severity: 'medium',
-    title: 'Storm Warning',
-    description: 'Severe thunderstorm approaching. High risk of power outages in next 4 hours.',
-    location: 'Bay Area',
-    time: '30 min ago',
-    duration: 'Next 4 hours',
-    affected: 0,
-    status: 'predicted',
-    icon: 'cloud-rain'
-  },
-  {
-    id: 3,
-    type: 'prediction',
-    severity: 'medium',
-    title: 'AI Outage Prediction',
-    description: 'High probability of outage in Mission Bay due to equipment maintenance',
-    location: 'Mission Bay',
-    time: '1 hour ago',
-    duration: 'Tomorrow 2-4 PM',
-    affected: 340,
-    status: 'predicted',
-    icon: 'alert-circle'
-  }
-];
+interface Notification {
+  id: string;
+  type: 'info' | 'warning' | 'success' | 'error';
+  title: string;
+  message: string;
+  timestamp: Date;
+  isRead: boolean;
+  actionRequired?: boolean;
+}
 
-const pastAlerts = [
-  {
-    id: 4,
-    type: 'outage',
-    severity: 'low',
-    title: 'Power Restored',
-    description: 'All customers in Castro District have power restored',
-    location: 'Castro District',
-    time: '3 hours ago',
-    duration: '45 minutes',
-    affected: 890,
-    status: 'resolved',
-    icon: 'check-circle'
-  },
-  {
-    id: 5,
-    type: 'maintenance',
-    severity: 'low',
-    title: 'Scheduled Maintenance Complete',
-    description: 'Planned maintenance in Nob Hill completed ahead of schedule',
-    location: 'Nob Hill',
-    time: '1 day ago',
-    duration: '2 hours',
-    affected: 150,
-    status: 'completed',
-    icon: 'settings'
-  },
-  {
-    id: 6,
-    type: 'weather',
-    severity: 'medium',
-    title: 'Wind Advisory Ended',
-    description: 'High wind conditions have subsided. No outages reported.',
-    location: 'San Francisco',
-    time: '2 days ago',
-    duration: '6 hours',
-    affected: 0,
-    status: 'resolved',
-    icon: 'wind'
-  }
-];
-
-const emergencyContacts = [
-  {
-    name: 'PG&E Outage Hotline',
-    type: 'utility',
-    phone: '1-800-743-5000',
-    description: 'Report outages and get updates',
-    available: '24/7',
-    icon: 'zap'
-  },
-  {
-    name: 'San Francisco Emergency',
-    type: 'emergency',
-    phone: '911',
-    description: 'Life-threatening emergencies only',
-    available: '24/7',
-    icon: 'alert-triangle'
-  },
-  {
-    name: 'Non-Emergency Services',
-    type: 'services',
-    phone: '311',
-    description: 'Non-urgent city services',
-    available: '24/7',
-    icon: 'phone'
-  },
-  {
-    name: 'Red Cross Emergency',
-    type: 'support',
-    phone: '1-800-733-2767',
-    description: 'Emergency shelter and assistance',
-    available: '24/7',
-    icon: 'users'
-  }
-];
-
-export function AlertsScreen({ onNavigate }: AlertsScreenProps) {
+export default function AlertsScreen() {
   const { colors } = useTheme();
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [selectedFilter, setSelectedFilter] = useState('all');
-  const [soundEnabled, setSoundEnabled] = useState(true);
-  const [activeTab, setActiveTab] = useState('active');
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const [activeTab, setActiveTab] = useState<'alerts' | 'notifications'>('alerts');
 
-  const handleCall = (phoneNumber: string) => {
-    const url = `tel:${phoneNumber}`;
-    Linking.canOpenURL(url)
-      .then((supported) => {
-        if (supported) {
-          return Linking.openURL(url);
+  useEffect(() => {
+    loadAlertsAndNotifications();
+  }, []);
+
+  const loadAlertsAndNotifications = async () => {
+    // Simulate loading data
+    const mockAlerts: Alert[] = [
+      {
+        id: '1',
+    type: 'outage',
+        title: 'Power Outage Detected',
+        message: 'A power outage has been reported in your area. Crews are investigating.',
+    severity: 'high',
+        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+        location: 'Nairobi West',
+        isRead: false,
+        estimatedDuration: '2-4 hours',
+        affectedCustomers: 1500,
+      },
+      {
+        id: '2',
+    type: 'prediction',
+        title: 'High Outage Risk',
+        message: 'AI predicts 75% chance of outage in the next 6 hours due to weather conditions.',
+    severity: 'medium',
+        timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
+        location: 'Nairobi West',
+        isRead: true,
+        affectedCustomers: 800,
+      },
+      {
+        id: '3',
+    type: 'maintenance',
+        title: 'Scheduled Maintenance',
+        message: 'Planned maintenance work will affect power supply in your area.',
+    severity: 'low',
+        timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
+        location: 'Nairobi West',
+        isRead: true,
+        estimatedDuration: '4 hours',
+        affectedCustomers: 2000,
+      },
+    ];
+
+    const mockNotifications: Notification[] = [
+      {
+        id: '1',
+        type: 'info',
+        title: 'Service Update',
+        message: 'Your area has been restored to full power supply.',
+        timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1 hour ago
+        isRead: false,
+      },
+      {
+        id: '2',
+        type: 'success',
+        title: 'Report Submitted',
+        message: 'Thank you for your outage report. We have received it and are investigating.',
+        timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000), // 3 hours ago
+        isRead: true,
+      },
+      {
+        id: '3',
+        type: 'warning',
+        title: 'Weather Alert',
+        message: 'Severe weather conditions may affect power supply in your area.',
+        timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
+        isRead: false,
+        actionRequired: true,
+      },
+    ];
+
+    setAlerts(mockAlerts);
+    setNotifications(mockNotifications);
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadAlertsAndNotifications();
+    setRefreshing(false);
+  };
+
+  const markAsRead = (id: string, type: 'alert' | 'notification') => {
+    if (type === 'alert') {
+      setAlerts(prev => prev.map(alert => 
+        alert.id === id ? { ...alert, isRead: true } : alert
+      ));
         } else {
-          Alert.alert('Error', 'Phone calls are not supported on this device');
+      setNotifications(prev => prev.map(notif => 
+        notif.id === id ? { ...notif, isRead: true } : notif
+      ));
         }
-      })
-      .catch((err) => {
-        console.error('Error making phone call:', err);
-        Alert.alert('Error', 'Unable to make phone call');
-      });
   };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'high': return colors.powerOff;
-      case 'medium': return colors.powerUnstable;
-      case 'low': return colors.powerOn;
+      case 'low': return colors.emergencySuccess;
+      case 'medium': return colors.emergencyWarning;
+      case 'high': return colors.emergencyDanger;
+      
+      case 'critical': return colors.emergencyPrimary;
       default: return colors.mutedForeground;
     }
   };
 
-  const getSeverityBadge = (severity: string) => {
-    switch (severity) {
-      case 'high': return 'destructive';
-      case 'medium': return 'secondary';
-      case 'low': return 'default';
-      default: return 'outline';
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case 'outage': return '⚡';
+      case 'prediction': return '🤖';
+      case 'weather': return '🌦️';
+      case 'maintenance': return '🔧';
+      default: return '📢';
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'ongoing': return colors.powerOff;
-      case 'predicted': return colors.powerUnstable;
-      case 'resolved': return colors.powerOn;
-      case 'completed': return colors.powerOn;
-      default: return colors.mutedForeground;
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case 'info': return 'ℹ️';
+      case 'warning': return '⚠️';
+      case 'success': return '✅';
+      case 'error': return '❌';
+      default: return '📢';
     }
   };
 
-  const filterOptions = [
-    { id: 'all', label: 'All', count: activeAlerts.length },
-    { id: 'outage', label: 'Outages', count: activeAlerts.filter(a => a.type === 'outage').length },
-    { id: 'weather', label: 'Weather', count: activeAlerts.filter(a => a.type === 'weather').length },
-    { id: 'prediction', label: 'Predictions', count: activeAlerts.filter(a => a.type === 'prediction').length }
-  ];
+  const formatTimestamp = (timestamp: Date) => {
+    const now = new Date();
+    const diff = now.getTime() - timestamp.getTime();
+    const minutes = Math.floor(diff / (1000 * 60));
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
-  const filteredAlerts = selectedFilter === 'all' 
-    ? activeAlerts 
-    : activeAlerts.filter(alert => alert.type === selectedFilter);
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    return `${days}d ago`;
+  };
+
+  const unreadCount = alerts.filter(a => !a.isRead).length + notifications.filter(n => !n.isRead).length;
+
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      {/* Header */}
+      <View style={[styles.header, { backgroundColor: colors.emergencyPrimary }]}>
+        <Text style={[styles.headerTitle, { color: colors.background }]}>Alerts & Notifications</Text>
+        {unreadCount > 0 && (
+          <Badge variant="secondary" style={styles.unreadBadge}>
+            <Text style={{ color: colors.background }}>{unreadCount}</Text>
+          </Badge>
+        )}
+      </View>
+
+      {/* Tab Navigation */}
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={[
+            styles.tab,
+            activeTab === 'alerts' && { backgroundColor: colors.primary }
+          ]}
+          onPress={() => setActiveTab('alerts')}
+        >
+          <Text style={[
+            styles.tabText,
+            { 
+              color: activeTab === 'alerts' 
+                ? colors.primaryForeground 
+                : colors.mutedForeground 
+            }
+          ]}>
+            Alerts ({alerts.length})
+          </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={[
+            styles.tab,
+            activeTab === 'notifications' && { backgroundColor: colors.primary }
+          ]}
+          onPress={() => setActiveTab('notifications')}
+        >
+          <Text style={[
+            styles.tabText,
+            { 
+              color: activeTab === 'notifications' 
+                ? colors.primaryForeground 
+                : colors.mutedForeground 
+            }
+          ]}>
+            Notifications ({notifications.length})
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView
+        style={styles.scrollView}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        showsVerticalScrollIndicator={false}
+      >
+        {activeTab === 'alerts' ? (
+          <View style={styles.content}>
+            {/* Alerts Summary */}
+            <Card style={styles.summaryCard}>
+              <Text style={[styles.summaryTitle, { color: colors.foreground }]}>
+                Current Status
+              </Text>
+              <View style={styles.summaryStats}>
+                <View style={styles.statItem}>
+                  <Text style={[styles.statNumber, { color: colors.primary }]}>
+                    {alerts.filter(a => a.type === 'outage').length}
+                  </Text>
+                  <Text style={[styles.statLabel, { color: colors.mutedForeground }]}>
+                    Active Outages
+                  </Text>
+                </View>
+                <View style={styles.statItem}>
+                  <Text style={[styles.statNumber, { color: colors.emergencyWarning }]}>
+                    {alerts.filter(a => a.type === 'prediction').length}
+                  </Text>
+                  <Text style={[styles.statLabel, { color: colors.mutedForeground }]}>
+                    Predictions
+                  </Text>
+                </View>
+                <View style={styles.statItem}>
+                  <Text style={[styles.statNumber, { color: colors.emergencySuccess }]}>
+                    {alerts.filter(a => a.isRead).length}
+                  </Text>
+                  <Text style={[styles.statLabel, { color: colors.mutedForeground }]}>
+                    Resolved
+                  </Text>
+                </View>
+              </View>
+            </Card>
+
+            {/* Alerts List */}
+            {alerts.map((alert, index) => (
+              <Card key={alert.id} style={styles.alertCard}>
+                <View style={styles.alertHeader}>
+                  <View style={styles.alertTypeContainer}>
+                    <Text style={styles.alertTypeIcon}>{getTypeIcon(alert.type)}</Text>
+                    <Badge 
+                      variant="secondary" 
+                      style={{ backgroundColor: getSeverityColor(alert.severity) }}
+                    >
+                                             <Text style={{ color: colors.primaryForeground }}>
+                         {alert.severity.toUpperCase()}
+                       </Text>
+                     </Badge>
+                   </View>
+                   <Text style={[styles.alertTime, { color: colors.mutedForeground }]}>
+                     {formatTimestamp(alert.timestamp)}
+                   </Text>
+                 </View>
+
+                 <Text style={[styles.alertTitle, { color: colors.foreground }]}>
+                   {alert.title}
+                 </Text>
+                 
+                 <Text style={[styles.alertMessage, { color: colors.mutedForeground }]}>
+                   {alert.message}
+                 </Text>
+
+                 <View style={styles.alertDetails}>
+                   <View style={styles.detailItem}>
+                     <Text style={[styles.detailLabel, { color: colors.mutedForeground }]}>
+                       Location:
+                     </Text>
+                     <Text style={[styles.detailValue, { color: colors.foreground }]}>
+                       {alert.location}
+                     </Text>
+                   </View>
+                   
+                   {alert.estimatedDuration && (
+                     <View style={styles.detailItem}>
+                       <Text style={[styles.detailLabel, { color: colors.mutedForeground }]}>
+                         Duration:
+                       </Text>
+                       <Text style={[styles.detailValue, { color: colors.foreground }]}>
+                         {alert.estimatedDuration}
+                       </Text>
+                     </View>
+                   )}
+                   
+                   {alert.affectedCustomers && (
+                     <View style={styles.detailItem}>
+                       <Text style={[styles.detailLabel, { color: colors.mutedForeground }]}>
+                         Affected:
+                       </Text>
+                       <Text style={[styles.detailValue, { color: colors.foreground }]}>
+                         {alert.affectedCustomers.toLocaleString()} customers
+                       </Text>
+                     </View>
+                   )}
+                 </View>
+
+                {!alert.isRead && (
+                  <TouchableOpacity
+                    style={styles.markReadButton}
+                    onPress={() => markAsRead(alert.id, 'alert')}
+                  >
+                    <Text style={[styles.markReadText, { color: colors.primary }]}>
+                      Mark as Read
+                    </Text>
+                  </TouchableOpacity>
+                )}
+
+                {index < alerts.length - 1 && <Separator />}
+              </Card>
+            ))}
+          </View>
+        ) : (
+          <View style={styles.content}>
+            {/* Notifications List */}
+            {notifications.map((notification, index) => (
+              <Card key={notification.id} style={styles.notificationCard}>
+                <View style={styles.notificationHeader}>
+                  <View style={styles.notificationTypeContainer}>
+                    <Text style={styles.notificationTypeIcon}>
+                      {getNotificationIcon(notification.type)}
+                    </Text>
+                                         <Badge 
+                       variant="secondary" 
+                       style={{ 
+                         backgroundColor: notification.actionRequired 
+                           ? colors.emergencyWarning 
+                           : colors.primary 
+                       }}
+                     >
+                       <Text style={{ color: colors.primaryForeground }}>
+                         {notification.actionRequired ? 'ACTION REQUIRED' : 'INFO'}
+                       </Text>
+                     </Badge>
+                   </View>
+                   <Text style={[styles.notificationTime, { color: colors.mutedForeground }]}>
+                     {formatTimestamp(notification.timestamp)}
+                   </Text>
+                 </View>
+
+                 <Text style={[styles.notificationTitle, { color: colors.foreground }]}>
+                   {notification.title}
+                 </Text>
+                 
+                 <Text style={[styles.notificationMessage, { color: colors.mutedForeground }]}>
+                   {notification.message}
+                 </Text>
+
+                {!notification.isRead && (
+                  <TouchableOpacity
+                    style={styles.markReadButton}
+                    onPress={() => markAsRead(notification.id, 'notification')}
+                  >
+                    <Text style={[styles.markReadText, { color: colors.primary }]}>
+                      Mark as Read
+                    </Text>
+                  </TouchableOpacity>
+                )}
+
+                {index < notifications.length - 1 && <Separator />}
+              </Card>
+            ))}
+          </View>
+        )}
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
 
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.background,
     },
     header: {
-      backgroundColor: colors.emergencyPrimary,
-      padding: 16,
-    },
-    headerContent: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
+    paddingVertical: 20,
+    paddingHorizontal: 20,
       alignItems: 'center',
-      marginBottom: 16,
+    position: 'relative',
     },
     headerTitle: {
-      fontSize: 20,
-      fontWeight: '600',
-      color: '#ffffff',
-    },
-    headerSubtitle: {
-      fontSize: 14,
-      color: 'rgba(255, 255, 255, 0.8)',
-      marginTop: 4,
-    },
-    notificationToggle: {
-      backgroundColor: 'rgba(255, 255, 255, 0.1)',
-      borderWidth: 1,
-      borderColor: 'rgba(255, 255, 255, 0.2)',
-      borderRadius: 12,
-      padding: 16,
-    },
-    toggleContent: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-    },
-    toggleLeft: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 12,
-    },
-    toggleText: {
-      color: '#ffffff',
-      fontWeight: '600',
-      fontSize: 16,
-    },
-    toggleSubtext: {
-      color: 'rgba(255, 255, 255, 0.8)',
-      fontSize: 14,
-      marginTop: 2,
-    },
-    content: {
-      flex: 1,
-      padding: 16,
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  unreadBadge: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
     },
     tabContainer: {
       flexDirection: 'row',
-      backgroundColor: colors.card,
-      borderRadius: 8,
-      padding: 4,
-      marginBottom: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    gap: 12,
     },
     tab: {
       flex: 1,
-      paddingVertical: 8,
+    paddingVertical: 12,
       paddingHorizontal: 16,
+    borderRadius: 8,
       alignItems: 'center',
-      borderRadius: 6,
-    },
-    activeTab: {
-      backgroundColor: colors.background,
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
     },
     tabText: {
       fontSize: 14,
-      fontWeight: '500',
-      color: colors.mutedForeground,
-    },
-    activeTabText: {
-      color: colors.foreground,
-    },
-    filterContainer: {
+    fontWeight: '600',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  content: {
+    padding: 20,
+    paddingTop: 0,
+  },
+  summaryCard: {
+    marginBottom: 20,
+  },
+  summaryTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  summaryStats: {
       flexDirection: 'row',
-      gap: 8,
-      marginBottom: 16,
-    },
-    filterButton: {
-      paddingHorizontal: 12,
-      paddingVertical: 6,
-      borderRadius: 16,
-      borderWidth: 1,
-      borderColor: colors.border,
-      backgroundColor: colors.card,
-    },
-    activeFilterButton: {
-      backgroundColor: colors.primary,
-      borderColor: colors.primary,
-    },
-    filterButtonText: {
+    justifyContent: 'space-around',
+  },
+  statItem: {
+    alignItems: 'center',
+  },
+  statNumber: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  statLabel: {
       fontSize: 12,
-      color: colors.foreground,
-    },
-    activeFilterButtonText: {
-      color: '#ffffff',
+    textAlign: 'center',
     },
     alertCard: {
-      marginBottom: 12,
-      borderWidth: 1,
-      borderRadius: 12,
-      backgroundColor: colors.card,
-    },
-    alertContent: {
-      padding: 16,
+    marginBottom: 16,
     },
     alertHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      alignItems: 'flex-start',
+    alignItems: 'center',
       marginBottom: 12,
     },
-    alertLeft: {
+  alertTypeContainer: {
       flexDirection: 'row',
-      alignItems: 'flex-start',
-      gap: 12,
-      flex: 1,
-    },
-    alertIcon: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    alertInfo: {
-      flex: 1,
+    alignItems: 'center',
+    gap: 8,
+  },
+  alertTypeIcon: {
+    fontSize: 20,
+  },
+  alertTime: {
+    fontSize: 12,
     },
     alertTitle: {
       fontSize: 16,
       fontWeight: '600',
-      color: colors.foreground,
-      marginBottom: 4,
+    marginBottom: 8,
+    lineHeight: 22,
     },
-    alertDescription: {
+  alertMessage: {
       fontSize: 14,
-      color: colors.mutedForeground,
-      marginBottom: 8,
-    },
-    alertMeta: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 16,
-    },
-    metaItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 4,
-    },
-    metaText: {
-      fontSize: 12,
-      color: colors.mutedForeground,
-    },
-    alertFooter: {
+    lineHeight: 20,
+    marginBottom: 16,
+  },
+  alertDetails: {
+    marginBottom: 16,
+  },
+  detailItem: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginTop: 12,
-    },
-    statusContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 8,
-    },
-    statusDot: {
-      width: 8,
-      height: 8,
-      borderRadius: 4,
-    },
-    statusText: {
+    marginBottom: 8,
+  },
+  detailLabel: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  detailValue: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  markReadButton: {
+    alignSelf: 'flex-end',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  markReadText: {
       fontSize: 14,
       fontWeight: '500',
-      textTransform: 'capitalize',
     },
-    durationText: {
-      fontSize: 14,
-      color: colors.mutedForeground,
+  alertSeparator: {
+    marginTop: 16,
     },
-    contactCard: {
+  notificationCard: {
       marginBottom: 16,
     },
-    contactItem: {
+  notificationHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      padding: 12,
-      backgroundColor: colors.muted + '20',
-      borderRadius: 8,
-      marginBottom: 8,
+    marginBottom: 12,
     },
-    contactLeft: {
+  notificationTypeContainer: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 12,
-      flex: 1,
-    },
-    contactIcon: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      backgroundColor: colors.emergencyPrimary + '20',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    contactInfo: {
-      flex: 1,
-    },
-    contactName: {
+    gap: 8,
+  },
+  notificationTypeIcon: {
+    fontSize: 20,
+  },
+  notificationTime: {
+    fontSize: 12,
+  },
+  notificationTitle: {
       fontSize: 16,
-      fontWeight: '500',
-      color: colors.foreground,
-      marginBottom: 2,
-    },
-    contactDescription: {
+    fontWeight: '600',
+    marginBottom: 8,
+    lineHeight: 22,
+  },
+  notificationMessage: {
       fontSize: 14,
-      color: colors.mutedForeground,
-      marginBottom: 4,
-    },
-    contactBadges: {
-      flexDirection: 'row',
-      gap: 8,
-    },
-    actionButtons: {
-      flexDirection: 'row',
-      gap: 8,
+    lineHeight: 20,
+    marginBottom: 16,
+  },
+  notificationSeparator: {
+    marginTop: 16,
     },
   });
-
-  return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <View>
-            <Text style={styles.headerTitle}>Alerts & Notifications</Text>
-            <Text style={styles.headerSubtitle}>{activeAlerts.length} active alerts</Text>
-          </View>
-          <TouchableOpacity
-            onPress={() => setSoundEnabled(!soundEnabled)}
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 20,
-              backgroundColor: 'rgba(255, 255, 255, 0.2)',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Icon 
-              name={soundEnabled ? 'volume-2' : 'volume-x'} 
-              size={20} 
-              color="#ffffff" 
-            />
-          </TouchableOpacity>
-        </View>
-
-        {/* Notification Toggle */}
-        <View style={styles.notificationToggle}>
-          <View style={styles.toggleContent}>
-            <View style={styles.toggleLeft}>
-              <Icon name="bell" size={20} color="#ffffff" />
-              <View>
-                <Text style={styles.toggleText}>Push Notifications</Text>
-                <Text style={styles.toggleSubtext}>Receive alerts on your device</Text>
-              </View>
-            </View>
-              <Switch
-              value={notificationsEnabled}
-              onValueChange={setNotificationsEnabled}
-            />
-          </View>
-        </View>
-      </View>
-
-      <View style={styles.content}>
-        {/* Tabs */}
-        <View style={styles.tabContainer}>
-          {['active', 'history', 'contacts'].map((tab) => (
-            <TouchableOpacity
-              key={tab}
-              style={[styles.tab, activeTab === tab && styles.activeTab]}
-              onPress={() => setActiveTab(tab)}
-            >
-              <Text style={[
-                styles.tabText, 
-                activeTab === tab && styles.activeTabText
-              ]}>
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {activeTab === 'active' && (
-          <>
-            {/* Alert Filters */}
-            <ScrollView 
-              horizontal 
-              showsHorizontalScrollIndicator={false}
-              style={styles.filterContainer}
-            >
-              {filterOptions.map((option) => (
-                <TouchableOpacity
-                  key={option.id}
-                  style={[
-                    styles.filterButton,
-                    selectedFilter === option.id && styles.activeFilterButton
-                  ]}
-                  onPress={() => setSelectedFilter(option.id)}
-                >
-                  <Text style={[
-                    styles.filterButtonText,
-                    selectedFilter === option.id && styles.activeFilterButtonText
-                  ]}>
-                  {option.label}
-                    {option.count > 0 && ` (${option.count})`}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-
-            {/* Active Alerts List */}
-            <ScrollView showsVerticalScrollIndicator={false}>
-              {filteredAlerts.map((alert) => (
-                <Card key={alert.id} style={{
-                  ...(styles.alertCard as any),
-                  borderColor: getSeverityColor(alert.severity)
-                }}>
-                  <CardContent style={styles.alertContent}>
-                    <View style={styles.alertHeader}>
-                      <View style={styles.alertLeft}>
-                        <View style={[
-                          styles.alertIcon,
-                          { backgroundColor: getSeverityColor(alert.severity) + '20' }
-                        ]}>
-                          <Icon 
-                            name={alert.icon as any} 
-                            size={20} 
-                            color={getSeverityColor(alert.severity)} 
-                          />
-                        </View>
-                        <View style={styles.alertInfo}>
-                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                            <Text style={styles.alertTitle}>{alert.title}</Text>
-                            <Badge variant={getSeverityBadge(alert.severity) as any}>
-                                {alert.severity}
-                              </Badge>
-                          </View>
-                          <Text style={styles.alertDescription}>{alert.description}</Text>
-                          <View style={styles.alertMeta}>
-                            <View style={styles.metaItem}>
-                              <Icon name="map-pin" size={12} color={colors.mutedForeground} />
-                              <Text style={styles.metaText}>{alert.location}</Text>
-                            </View>
-                            <View style={styles.metaItem}>
-                              <Icon name="clock" size={12} color={colors.mutedForeground} />
-                              <Text style={styles.metaText}>{alert.time}</Text>
-                            </View>
-                              {alert.affected > 0 && (
-                              <View style={styles.metaItem}>
-                                <Icon name="users" size={12} color={colors.mutedForeground} />
-                                <Text style={styles.metaText}>{alert.affected.toLocaleString()} affected</Text>
-                              </View>
-                            )}
-                          </View>
-                        </View>
-                      </View>
-                      <TouchableOpacity>
-                        <Icon name="share-2" size={16} color={colors.mutedForeground} />
-                      </TouchableOpacity>
-                    </View>
-                    
-                    <View style={styles.alertFooter}>
-                      <View style={styles.statusContainer}>
-                        <View style={[
-                          styles.statusDot,
-                          { backgroundColor: getStatusColor(alert.status) }
-                        ]} />
-                        <Text style={[
-                          styles.statusText,
-                          { color: getStatusColor(alert.status) }
-                        ]}>
-                            {alert.status}
-                        </Text>
-                        <Text style={styles.durationText}> • {alert.duration}</Text>
-                      </View>
-                      <Button title="View Details" variant="outline" size="sm" onPress={() => {}} />
-                    </View>
-                  </CardContent>
-                </Card>
-              ))}
-            </ScrollView>
-          </>
-        )}
-
-        {activeTab === 'history' && (
-          <ScrollView showsVerticalScrollIndicator={false}>
-            {pastAlerts.map((alert) => (
-              <Card key={alert.id} style={styles.alertCard}>
-                <CardContent style={styles.alertContent}>
-                  <View style={styles.alertLeft}>
-                    <View style={[styles.alertIcon, { backgroundColor: colors.muted }]}>
-                      <Icon name={alert.icon as any} size={16} color={colors.mutedForeground} />
-                    </View>
-                    <View style={styles.alertInfo}>
-                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
-                        <Text style={styles.alertTitle}>{alert.title}</Text>
-                        <Text style={styles.metaText}>{alert.time}</Text>
-                      </View>
-                      <Text style={styles.alertDescription}>{alert.description}</Text>
-                      <View style={styles.alertMeta}>
-                        <View style={styles.metaItem}>
-                          <Icon name="map-pin" size={12} color={colors.mutedForeground} />
-                          <Text style={styles.metaText}>{alert.location}</Text>
-                        </View>
-                        <View style={styles.metaItem}>
-                          <Icon name="clock" size={12} color={colors.mutedForeground} />
-                          <Text style={styles.metaText}>Duration: {alert.duration}</Text>
-                        </View>
-                        {alert.affected > 0 && (
-                          <View style={styles.metaItem}>
-                            <Icon name="users" size={12} color={colors.mutedForeground} />
-                            <Text style={styles.metaText}>{alert.affected.toLocaleString()}</Text>
-                          </View>
-                        )}
-                      </View>
-                    </View>
-                  </View>
-                </CardContent>
-              </Card>
-            ))}
-          </ScrollView>
-        )}
-
-        {activeTab === 'contacts' && (
-          <ScrollView showsVerticalScrollIndicator={false}>
-            {/* Emergency Contact Integration */}
-            <Card style={styles.contactCard}>
-              <CardHeader>
-                <Text style={{ fontSize: 16, fontWeight: '600', color: colors.foreground }}>
-                  Emergency Contacts
-                </Text>
-                <Text style={{ fontSize: 14, color: colors.mutedForeground, marginTop: 4 }}>
-                  Quick access to utility companies and emergency services
-                </Text>
-              </CardHeader>
-              <CardContent>
-                {emergencyContacts.map((contact) => (
-                  <View key={contact.name} style={styles.contactItem}>
-                    <View style={styles.contactLeft}>
-                      <View style={styles.contactIcon}>
-                        <Icon name={contact.icon as any} size={20} color={colors.emergencyPrimary} />
-                      </View>
-                      <View style={styles.contactInfo}>
-                        <Text style={styles.contactName}>{contact.name}</Text>
-                        <Text style={styles.contactDescription}>{contact.description}</Text>
-                        <View style={styles.contactBadges}>
-                          <Badge variant="outline">
-                              {contact.available}
-                            </Badge>
-                          <Badge variant="secondary">
-                              {contact.type}
-                            </Badge>
-                        </View>
-                      </View>
-                    </View>
-                    <View style={styles.actionButtons}>
-                      <Button title="Call" variant="outline" size="sm" onPress={() => handleCall(contact.phone)} />
-                      <TouchableOpacity
-                        style={{
-                          padding: 8,
-                          borderRadius: 6,
-                          backgroundColor: colors.muted + '40'
-                        }}
-                        onPress={() => {}}
-                      >
-                        <Icon name="more-horizontal" size={16} color={colors.foreground} />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                ))}
-              </CardContent>
-            </Card>
-
-            {/* Alert Sharing Options */}
-            <Card style={styles.contactCard}>
-              <CardHeader>
-                <Text style={{ fontSize: 16, fontWeight: '600', color: colors.foreground }}>
-                  Alert Sharing Options
-                </Text>
-                <Text style={{ fontSize: 14, color: colors.mutedForeground, marginTop: 4 }}>
-                  Share alerts with family and friends
-                </Text>
-              </CardHeader>
-              <CardContent>
-                <Button title="Share Current Alert" variant="outline" style={{ marginBottom: 8 }} onPress={() => {}} />
-                <Button title="Add Emergency Contact" variant="outline" style={{ marginBottom: 8 }} onPress={() => {}} />
-                <Button title="Sharing Preferences" variant="outline" onPress={() => {}} />
-              </CardContent>
-            </Card>
-          </ScrollView>
-        )}
-      </View>
-    </SafeAreaView>
-  );
-}

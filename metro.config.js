@@ -6,6 +6,14 @@ const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
  *
  * @type {import('@react-native/metro-config').MetroConfig}
  */
-const config = {};
+const defaultConfig = getDefaultConfig(__dirname);
+
+// Ensure Metro treats TensorFlow weight binaries as assets
+defaultConfig.resolver.assetExts = [
+  ...defaultConfig.resolver.assetExts,
+  'bin',
+];
+
+const config = defaultConfig;
 
 module.exports = mergeConfig(getDefaultConfig(__dirname), config);

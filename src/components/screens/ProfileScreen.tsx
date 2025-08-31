@@ -1,529 +1,463 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Alert,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/Feather';
-import { Card, CardContent, CardHeader } from '../ui/Card';
-import { Button } from '../ui/Button';
-import { Switch } from '../ui/Switch';
-import { Separator } from '../ui/separator';
-import { Badge } from '../ui/Badge';
-import { Avatar } from '../ui/Avatar';
+import { supabase } from '../../backend/supabase/SupabaseService';
 import { useTheme } from '../../contexts/ThemeContext';
+import { Card } from '../ui/Card';
+import { Button } from '../ui/Button';
+import { Avatar } from '../ui/Avatar';
+import { Separator } from '../ui/Separator';
+import { Switch } from '../ui/Switch';
 
-interface ProfileScreenProps {
-  onNavigate: (screen: string) => void;
-  onToggleTheme: () => void;
-  isDark: boolean;
+interface UserProfile {
+  id: string;
+  email: string;
+  full_name?: string;
+  location?: string;
+  phone?: string;
+  created_at: string;
+  avatar_url?: string;
 }
 
-export function ProfileScreen({ onNavigate, onToggleTheme, isDark }: ProfileScreenProps) {
+export default function ProfileScreen() {
   const { colors } = useTheme();
-  const [notifications, setNotifications] = useState({
-    outageAlerts: true,
-    predictions: true,
-    communityReports: false,
-    weatherAlerts: true,
-    push: true,
-    email: false,
-    sms: true
-  });
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [editedProfile, setEditedProfile] = useState<Partial<UserProfile>>({});
 
-  const [location, setLocation] = useState({
-    autoDetect: true,
-    shareLocation: true,
-    preciseLocation: false
-  });
+  useEffect(() => {
+    loadUserProfile();
+  }, []);
 
-  const [dataSettings, setDataSettings] = useState({
-    offlineSync: true,
-    autoDownload: false,
-    lowDataMode: false
-  });
+  const loadUserProfile = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        let profileData = null;
+        
+        try {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
 
-  const userInfo = {
-    name: 'Sarah Johnson',
-    email: 'sarah.j@email.com',
-    location: 'San Francisco, CA',
-    joinDate: 'March 2024',
-    reportsSubmitted: 12,
-    accuracyRating: 94
+          if (error && error.code !== 'PGRST116') {
+            console.error('Error loading profile:', error);
+          } else {
+            profileData = data;
+          }
+        } catch (dbError) {
+          console.error('Database error:', dbError);
+          // Continue with default profile
+        }
+
+        const userProfile: UserProfile = {
+          id: user.id,
+          email: user.email || '',
+          full_name: profileData?.full_name || user.user_metadata?.full_name || 'User',
+          location: profileData?.location || 'Nairobi, Kenya',
+          phone: profileData?.phone || '',
+          created_at: user.created_at,
+        };
+
+        setProfile(userProfile);
+        setEditedProfile(userProfile);
+      } else {
+        // Create a default profile if no user
+        const defaultProfile: UserProfile = {
+          id: 'default',
+          email: 'user@example.com',
+          full_name: 'Demo User',
+          location: 'Nairobi, Kenya',
+          phone: '',
+          created_at: new Date().toISOString(),
+        };
+        setProfile(defaultProfile);
+        setEditedProfile(defaultProfile);
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error);
+      // Set fallback profile
+      const fallbackProfile: UserProfile = {
+        id: 'fallback',
+        email: 'user@example.com',
+        full_name: 'Demo User',
+        location: 'Nairobi, Kenya',
+        phone: '',
+        created_at: new Date().toISOString(),
+      };
+      setProfile(fallbackProfile);
+      setEditedProfile(fallbackProfile);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  const handleSave = async () => {
+    if (!profile) return;
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: profile.id,
+          full_name: editedProfile.full_name,
+          location: editedProfile.location,
+          phone: editedProfile.phone,
+          updated_at: new Date().toISOString(),
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      setProfile({ ...profile, ...editedProfile });
+      setIsEditing(false);
+      Alert.alert('Success', 'Profile updated successfully');
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      Alert.alert('Error', 'Failed to update profile');
+    }
+  };
+
+  const handleCancel = () => {
+    setEditedProfile(profile || {});
+    setIsEditing(false);
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={styles.loadingContainer}>
+          <Text style={[styles.loadingText, { color: colors.foreground }]}>Loading profile...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={styles.errorContainer}>
+          <Text style={[styles.errorText, { color: colors.foreground }]}>Failed to load profile</Text>
+          <Button title="Retry" onPress={loadUserProfile} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardView}
+      >
+        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+          {/* Header */}
+                <View style={[styles.header, { backgroundColor: colors.emergencyPrimary }]}>
+        <Text style={[styles.headerTitle, { color: colors.background }]}>Profile</Text>
+          </View>
+
+          {/* Profile Info */}
+          <View style={styles.profileSection}>
+            <Avatar 
+              size={80} 
+              source={profile.avatar_url ? { uri: profile.avatar_url } : undefined}
+              fallback={profile.full_name?.charAt(0) || profile.email.charAt(0).toUpperCase()}
+            />
+            <Text style={[styles.profileName, { color: colors.foreground }]}>
+              {profile.full_name || 'No name set'}
+            </Text>
+            <Text style={[styles.profileEmail, { color: colors.mutedForeground }]}>
+              {profile.email}
+            </Text>
+          </View>
+
+          {/* Profile Details */}
+          <Card style={styles.detailsCard}>
+            <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Personal Information</Text>
+            
+            <View style={styles.inputGroup}>
+              <Text style={[styles.inputLabel, { color: colors.mutedForeground }]}>Full Name</Text>
+              {isEditing ? (
+                <TextInput
+                  style={[styles.textInput, { 
+                    backgroundColor: colors.card,
+                    color: colors.foreground,
+                    borderColor: colors.border 
+                  }]}
+                  value={editedProfile.full_name || ''}
+                  onChangeText={(text) => setEditedProfile({ ...editedProfile, full_name: text })}
+                  placeholder="Enter your full name"
+                  placeholderTextColor={colors.mutedForeground}
+                />
+              ) : (
+                <Text style={[styles.infoText, { color: colors.foreground }]}>
+                  {profile.full_name || 'Not set'}
+                </Text>
+              )}
+            </View>
+
+            <Separator />
+
+            <View style={styles.inputGroup}>
+              <Text style={[styles.inputLabel, { color: colors.mutedForeground }]}>Location</Text>
+              {isEditing ? (
+                <TextInput
+                  style={[styles.textInput, { 
+                    backgroundColor: colors.card,
+                    color: colors.foreground,
+                    borderColor: colors.border 
+                  }]}
+                  value={editedProfile.location || ''}
+                  onChangeText={(text) => setEditedProfile({ ...editedProfile, location: text })}
+                  placeholder="Enter your location"
+                  placeholderTextColor={colors.mutedForeground}
+                />
+              ) : (
+                <Text style={[styles.infoText, { color: colors.foreground }]}>
+                  {profile.location || 'Not set'}
+                </Text>
+              )}
+            </View>
+
+            <Separator />
+
+            <View style={styles.inputGroup}>
+              <Text style={[styles.inputLabel, { color: colors.mutedForeground }]}>Phone</Text>
+              {isEditing ? (
+                <TextInput
+                  style={[styles.textInput, { 
+                    backgroundColor: colors.card,
+                    color: colors.foreground,
+                    borderColor: colors.border 
+                  }]}
+                  value={editedProfile.phone || ''}
+                  onChangeText={(text) => setEditedProfile({ ...editedProfile, phone: text })}
+                  placeholder="Enter your phone number"
+                  placeholderTextColor={colors.mutedForeground}
+                  keyboardType="phone-pad"
+                />
+              ) : (
+                <Text style={[styles.infoText, { color: colors.foreground }]}>
+                  {profile.phone || 'Not set'}
+                </Text>
+              )}
+            </View>
+
+            <Separator />
+
+            <View style={styles.inputGroup}>
+              <Text style={[styles.inputLabel, { color: colors.mutedForeground }]}>Member Since</Text>
+              <Text style={[styles.infoText, { color: colors.foreground }]}>
+                {new Date(profile.created_at).toLocaleDateString()}
+              </Text>
+            </View>
+          </Card>
+
+          {/* Settings */}
+          <Card style={styles.settingsCard}>
+            <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Settings</Text>
+            
+            <View style={styles.settingItem}>
+              <View style={styles.settingInfo}>
+                <Text style={[styles.settingLabel, { color: colors.foreground }]}>Push Notifications</Text>
+                <Text style={[styles.settingDescription, { color: colors.mutedForeground }]}>
+                  Receive alerts about power outages
+                </Text>
+              </View>
+              <Switch value={true} onValueChange={() => {}} />
+            </View>
+
+            <Separator />
+
+            <View style={styles.settingItem}>
+              <View style={styles.settingInfo}>
+                <Text style={[styles.settingLabel, { color: colors.foreground }]}>Location Services</Text>
+                <Text style={[styles.settingDescription, { color: colors.mutedForeground }]}>
+                  Get personalized outage alerts
+                </Text>
+              </View>
+              <Switch value={true} onValueChange={() => {}} />
+            </View>
+          </Card>
+
+          {/* Action Buttons */}
+          <View style={styles.actionButtons}>
+            {isEditing ? (
+              <>
+                <Button 
+                  title="Save Changes" 
+                  onPress={handleSave}
+                  style={styles.saveButton}
+                />
+                <Button 
+                  title="Cancel" 
+                  onPress={handleCancel}
+                  variant="outline"
+                  style={styles.cancelButton}
+                />
+              </>
+            ) : (
+              <Button 
+                title="Edit Profile" 
+                onPress={() => setIsEditing(true)}
+                style={styles.editButton}
+              />
+            )}
+            
+            <Button 
+              title="Sign Out" 
+              onPress={handleSignOut}
+              variant="outline"
+              style={styles.signOutButton}
+            />
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+}
 
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+  },
+  keyboardView: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
     },
     header: {
-      backgroundColor: colors.emergencyPrimary,
-      padding: 16,
-    },
-    headerContent: {
-      flexDirection: 'row',
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  profileSection: {
       alignItems: 'center',
-      gap: 16,
-    },
-    avatarContainer: {
-      width: 64,
-      height: 64,
-      borderRadius: 32,
-      borderWidth: 2,
-      borderColor: 'rgba(255, 255, 255, 0.2)',
-      overflow: 'hidden',
-    },
-    userInfo: {
-      flex: 1,
-    },
-    userName: {
-      fontSize: 20,
-      fontWeight: '600',
-      color: '#ffffff',
-    },
-    userEmail: {
-      fontSize: 14,
-      color: 'rgba(255, 255, 255, 0.8)',
-      marginTop: 2,
-    },
-    badgeContainer: {
-      flexDirection: 'row',
-      gap: 8,
-      marginTop: 8,
-    },
-    editButton: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      backgroundColor: 'rgba(255, 255, 255, 0.2)',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    content: {
-      flex: 1,
-      padding: 16,
-    },
-    cardSpacing: {
-      marginBottom: 24,
-    },
-    cardTitle: {
+    paddingVertical: 30,
+    paddingHorizontal: 20,
+  },
+  profileName: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginTop: 16,
+    textAlign: 'center',
+  },
+  profileEmail: {
+    fontSize: 16,
+    marginTop: 8,
+    textAlign: 'center',
+  },
+  detailsCard: {
+    margin: 20,
+    marginTop: 0,
+  },
+  settingsCard: {
+    margin: 20,
+    marginTop: 0,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  inputGroup: {
+    marginBottom: 20,
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  textInput: {
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 16,
+  },
+  infoText: {
       fontSize: 16,
-      fontWeight: '600',
-      color: colors.foreground,
-      marginBottom: 4,
-    },
-    cardDescription: {
-      fontSize: 14,
-      color: colors.mutedForeground,
-      marginTop: 4,
-    },
-    settingRow: {
+    paddingVertical: 10,
+  },
+  settingItem: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: 16,
+    paddingVertical: 16,
     },
     settingInfo: {
       flex: 1,
       marginRight: 16,
     },
-    settingTitle: {
+  settingLabel: {
       fontSize: 16,
-      fontWeight: '500',
-      color: colors.foreground,
-      marginBottom: 2,
+    fontWeight: '600',
+    marginBottom: 4,
     },
-    settingSubtitle: {
+  settingDescription: {
       fontSize: 14,
-      color: colors.mutedForeground,
-    },
-    infoRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
+  },
+  actionButtons: {
+    padding: 20,
+    paddingTop: 0,
+  },
+  editButton: {
+    marginBottom: 12,
+  },
+  saveButton: {
+    marginBottom: 12,
+  },
+  cancelButton: {
       marginBottom: 12,
     },
-    infoLabel: {
-      fontSize: 14,
-      color: colors.mutedForeground,
-    },
-    infoValue: {
-      fontSize: 14,
-      fontWeight: '500',
-      color: colors.foreground,
-    },
-    buttonContainer: {
-      marginTop: 8,
+  signOutButton: {
+    marginTop: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 16,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: 'center',
     },
   });
 
-  return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <View style={styles.avatarContainer}>
-            <Avatar size={64} />
-          </View>
-          <View style={styles.userInfo}>
-            <Text style={styles.userName}>{userInfo.name}</Text>
-            <Text style={styles.userEmail}>{userInfo.email}</Text>
-            <View style={styles.badgeContainer}>
-              <Badge variant="secondary" style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}>
-                <Text style={{ color: '#ffffff' }}>{userInfo.reportsSubmitted} Reports</Text>
-              </Badge>
-              <Badge variant="secondary" style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}>
-                <Text style={{ color: '#ffffff' }}>{userInfo.accuracyRating}% Accuracy</Text>
-              </Badge>
-            </View>
-          </View>
-          <TouchableOpacity style={styles.editButton}>
-            <Icon name="edit" size={16} color="#ffffff" />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* User Profile Info */}
-        <Card style={styles.cardSpacing}>
-          <CardHeader>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Icon name="user" size={16} color={colors.foreground} style={{ marginRight: 8 }} />
-              <Text style={styles.cardTitle}>Profile Information</Text>
-            </View>
-          </CardHeader>
-          <CardContent>
-            <View style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>Location</Text>
-                <Text style={styles.settingSubtitle}>{userInfo.location}</Text>
-              </View>
-              <Button title="Update" variant="outline" size="sm" onPress={() => {}} />
-            </View>
-            <Separator />
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Member Since</Text>
-              <Text style={styles.infoValue}>{userInfo.joinDate}</Text>
-            </View>
-          </CardContent>
-        </Card>
-
-        {/* Location Settings */}
-        <Card style={styles.cardSpacing}>
-          <CardHeader>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Icon name="map-pin" size={16} color={colors.foreground} style={{ marginRight: 8 }} />
-              <Text style={styles.cardTitle}>Location Settings</Text>
-            </View>
-            <Text style={styles.cardDescription}>Manage how your location is used</Text>
-          </CardHeader>
-          <CardContent>
-            <View style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>Auto-detect location</Text>
-                <Text style={styles.settingSubtitle}>Automatically detect your current location</Text>
-              </View>
-              <Switch
-                value={location.autoDetect}
-                onValueChange={(checked) => setLocation({ ...location, autoDetect: checked })}
-              />
-            </View>
-            <View style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>Share with community</Text>
-                <Text style={styles.settingSubtitle}>Help improve predictions for your area</Text>
-              </View>
-              <Switch
-                value={location.shareLocation}
-                onValueChange={(checked) => setLocation({ ...location, shareLocation: checked })}
-              />
-            </View>
-            <View style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>Precise location</Text>
-                <Text style={styles.settingSubtitle}>Use GPS for exact coordinates</Text>
-              </View>
-              <Switch
-                value={location.preciseLocation}
-                onValueChange={(checked) => setLocation({ ...location, preciseLocation: checked })}
-              />
-            </View>
-          </CardContent>
-        </Card>
-
-        {/* Notification Preferences */}
-        <Card style={styles.cardSpacing}>
-          <CardHeader>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Icon name="bell" size={16} color={colors.foreground} style={{ marginRight: 8 }} />
-              <Text style={styles.cardTitle}>Notification Preferences</Text>
-            </View>
-            <Text style={styles.cardDescription}>Choose what alerts you want to receive</Text>
-          </CardHeader>
-          <CardContent>
-            <View style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>Outage Alerts</Text>
-                <Text style={styles.settingSubtitle}>Current and predicted outages in your area</Text>
-              </View>
-              <Switch
-                value={notifications.outageAlerts}
-                onValueChange={(checked) => setNotifications({ ...notifications, outageAlerts: checked })}
-              />
-            </View>
-            <View style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>AI Predictions</Text>
-                <Text style={styles.settingSubtitle}>New prediction updates</Text>
-              </View>
-              <Switch
-                value={notifications.predictions}
-                onValueChange={(checked) => setNotifications({ ...notifications, predictions: checked })}
-              />
-            </View>
-            <View style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>Community Reports</Text>
-                <Text style={styles.settingSubtitle}>New reports from nearby users</Text>
-              </View>
-              <Switch
-                value={notifications.communityReports}
-                onValueChange={(checked) => setNotifications({ ...notifications, communityReports: checked })}
-              />
-            </View>
-            <View style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>Weather Alerts</Text>
-                <Text style={styles.settingSubtitle}>Severe weather that may cause outages</Text>
-              </View>
-              <Switch
-                value={notifications.weatherAlerts}
-                onValueChange={(checked) => setNotifications({ ...notifications, weatherAlerts: checked })}
-              />
-            </View>
-            
-            <Separator />
-            <Text style={[styles.settingTitle, { marginTop: 16, marginBottom: 12 }]}>Delivery Methods</Text>
-            <View style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Icon name="smartphone" size={16} color={colors.mutedForeground} style={{ marginRight: 8 }} />
-                  <Text style={styles.settingSubtitle}>Push Notifications</Text>
-                </View>
-              </View>
-                <Switch
-                value={notifications.push}
-                onValueChange={(checked) => setNotifications({ ...notifications, push: checked })}
-              />
-            </View>
-            <View style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Icon name="mail" size={16} color={colors.mutedForeground} style={{ marginRight: 8 }} />
-                  <Text style={styles.settingSubtitle}>Email</Text>
-                </View>
-              </View>
-                <Switch
-                value={notifications.email}
-                onValueChange={(checked) => setNotifications({ ...notifications, email: checked })}
-              />
-            </View>
-            <View style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Icon name="message-square" size={16} color={colors.mutedForeground} style={{ marginRight: 8 }} />
-                  <Text style={styles.settingSubtitle}>SMS</Text>
-                </View>
-              </View>
-                <Switch
-                value={notifications.sms}
-                onValueChange={(checked) => setNotifications({ ...notifications, sms: checked })}
-                />
-            </View>
-          </CardContent>
-        </Card>
-
-        {/* Theme Toggle */}
-        <Card style={styles.cardSpacing}>
-          <CardHeader>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Icon 
-                name={isDark ? "moon" : "sun"} 
-                size={16} 
-                color={colors.foreground} 
-                style={{ marginRight: 8 }} 
-              />
-              <Text style={styles.cardTitle}>Appearance</Text>
-            </View>
-            <Text style={styles.cardDescription}>Customize the app's appearance</Text>
-          </CardHeader>
-          <CardContent>
-            <View style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>Dark Mode</Text>
-                <Text style={styles.settingSubtitle}>
-                  {isDark ? 'Switch to light theme' : 'Switch to dark theme'}
-                </Text>
-              </View>
-              <Switch
-                value={isDark}
-                onValueChange={onToggleTheme}
-              />
-            </View>
-          </CardContent>
-        </Card>
-
-        {/* Data Usage Settings */}
-        <Card style={styles.cardSpacing}>
-          <CardHeader>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Icon name="database" size={16} color={colors.foreground} style={{ marginRight: 8 }} />
-              <Text style={styles.cardTitle}>Data Usage Settings</Text>
-            </View>
-            <Text style={styles.cardDescription}>Manage how the app uses your data</Text>
-          </CardHeader>
-          <CardContent>
-            <View style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>Low Data Mode</Text>
-                <Text style={styles.settingSubtitle}>Reduce data usage when possible</Text>
-              </View>
-              <Switch
-                value={dataSettings.lowDataMode}
-                onValueChange={(checked) => setDataSettings({ ...dataSettings, lowDataMode: checked })}
-              />
-            </View>
-            <View style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>Auto Download Maps</Text>
-                <Text style={styles.settingSubtitle}>Download map data for offline use</Text>
-              </View>
-              <Switch
-                value={dataSettings.autoDownload}
-                onValueChange={(checked) => setDataSettings({ ...dataSettings, autoDownload: checked })}
-              />
-            </View>
-          </CardContent>
-        </Card>
-
-        {/* Offline Data Management */}
-        <Card style={styles.cardSpacing}>
-          <CardHeader>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Icon name="wifi" size={16} color={colors.foreground} style={{ marginRight: 8 }} />
-              <Text style={styles.cardTitle}>Offline Data Management</Text>
-            </View>
-            <Text style={styles.cardDescription}>Control offline data and sync settings</Text>
-          </CardHeader>
-          <CardContent>
-            <View style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>Offline Sync</Text>
-                <Text style={styles.settingSubtitle}>Sync data when connection is restored</Text>
-              </View>
-              <Switch
-                value={dataSettings.offlineSync}
-                onValueChange={(checked) => setDataSettings({ ...dataSettings, offlineSync: checked })}
-              />
-            </View>
-            <View style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>Cached Data</Text>
-                <Text style={styles.settingSubtitle}>2.3 MB stored locally</Text>
-              </View>
-              <Button title="Clear Cache" variant="outline" size="sm" onPress={() => {}} />
-            </View>
-          </CardContent>
-        </Card>
-
-        {/* Export Personal Data */}
-        <Card style={styles.cardSpacing}>
-          <CardHeader>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Icon name="download" size={16} color={colors.foreground} style={{ marginRight: 8 }} />
-              <Text style={styles.cardTitle}>Export Personal Data</Text>
-            </View>
-            <Text style={styles.cardDescription}>Download your data and reports</Text>
-          </CardHeader>
-          <CardContent>
-            <View style={styles.buttonContainer}>
-              <Button title="Export Report History" variant="outline" style={{ marginBottom: 8 }} onPress={() => {}} />
-              <Button title="Export Account Data" variant="outline" onPress={() => {}} />
-            </View>
-          </CardContent>
-        </Card>
-
-        {/* Help & Support */}
-        <Card style={styles.cardSpacing}>
-          <CardHeader>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Icon name="help-circle" size={16} color={colors.foreground} style={{ marginRight: 8 }} />
-              <Text style={styles.cardTitle}>Help & Support</Text>
-            </View>
-          </CardHeader>
-          <CardContent>
-            <TouchableOpacity style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>FAQ</Text>
-                <Text style={styles.settingSubtitle}>Frequently asked questions</Text>
-              </View>
-              <Icon name="chevron-right" size={16} color={colors.mutedForeground} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>Contact Support</Text>
-                <Text style={styles.settingSubtitle}>Get help with the app</Text>
-              </View>
-              <Icon name="chevron-right" size={16} color={colors.mutedForeground} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>Privacy Policy</Text>
-                <Text style={styles.settingSubtitle}>How we handle your data</Text>
-              </View>
-              <Icon name="chevron-right" size={16} color={colors.mutedForeground} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>Terms of Service</Text>
-                <Text style={styles.settingSubtitle}>App usage terms</Text>
-              </View>
-              <Icon name="chevron-right" size={16} color={colors.mutedForeground} />
-            </TouchableOpacity>
-          </CardContent>
-        </Card>
-
-        {/* App Version Info */}
-        <Card style={styles.cardSpacing}>
-          <CardHeader>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Icon name="info" size={16} color={colors.foreground} style={{ marginRight: 8 }} />
-              <Text style={styles.cardTitle}>App Information</Text>
-            </View>
-          </CardHeader>
-          <CardContent>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Version</Text>
-              <Text style={styles.infoValue}>2.1.0 (Build 145)</Text>
-            </View>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Last Updated</Text>
-              <Text style={styles.infoValue}>Jan 15, 2025</Text>
-            </View>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>AI Model Version</Text>
-              <Text style={styles.infoValue}>v3.2.1</Text>
-            </View>
-            <View style={styles.buttonContainer}>
-              <Button title="Check for Updates" variant="outline" size="sm" onPress={() => {}} />
-            </View>
-          </CardContent>
-        </Card>
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
