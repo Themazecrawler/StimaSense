@@ -24,14 +24,46 @@ def load_and_preprocess_data(input_path):
     # Load parquet file
     df = pd.read_parquet(input_path)
     print(f"Loaded {len(df)} records")
+    print(f"Available columns: {list(df.columns)}")
     
-    # Extract weather features
-    weather_features = ['temperature', 'humidity', 'wind_speed', 'pressure', 'visibility']
+    # Create datetime features from power_outage_datetime
+    df['power_outage_datetime'] = pd.to_datetime(df['power_outage_datetime'])
+    df['hour'] = df['power_outage_datetime'].dt.hour
+    df['day_of_week'] = df['power_outage_datetime'].dt.dayofweek
+    df['month'] = df['power_outage_datetime'].dt.month
+    df['is_weekend'] = (df['day_of_week'] >= 5).astype(int)
+    
+    # Create outage target variable (1 if customers_out > 0, 0 otherwise)
+    df['outage_occurred'] = (df['customers_out'] > 0).astype(int)
+    
+    # Use available storm/weather features as proxies
+    # MAGNITUDE_IMPUTED represents storm intensity (wind speed proxy)
+    # DAMAGE_PROPERTY represents storm severity (weather impact proxy)
+    # duration_hours represents storm duration
+    
+    # Fill missing values with medians
+    df['MAGNITUDE_IMPUTED'] = df['MAGNITUDE_IMPUTED'].fillna(df['MAGNITUDE_IMPUTED'].median())
+    df['DAMAGE_PROPERTY'] = df['DAMAGE_PROPERTY'].fillna(0)
+    df['duration_hours'] = df['duration_hours'].fillna(df['duration_hours'].median())
+    df['customers_out'] = df['customers_out'].fillna(0)
+    
+    # Create weather-like features from available data
+    weather_features = [
+        'MAGNITUDE_IMPUTED',  # Storm magnitude (wind speed proxy)
+        'duration_hours',     # Storm duration (weather persistence proxy) 
+        'DAMAGE_PROPERTY',    # Property damage (weather severity proxy)
+        'INJURIES_DIRECT',    # Direct injuries (storm impact proxy)
+        'customers_out'       # Number of customers affected (grid load proxy)
+    ]
+    
+    # Fill remaining missing values
+    for feature in weather_features:
+        df[feature] = df[feature].fillna(0)
     
     # Extract temporal features  
     temporal_features = ['hour', 'day_of_week', 'month', 'is_weekend']
     
-    # Create feature matrix
+    # Create feature matrices
     X_weather = df[weather_features].values
     X_temporal = df[temporal_features].values
     
@@ -41,6 +73,8 @@ def load_and_preprocess_data(input_path):
     print(f"Weather features shape: {X_weather.shape}")
     print(f"Temporal features shape: {X_temporal.shape}")
     print(f"Target distribution: {np.bincount(y)}")
+    print(f"Weather features used: {weather_features}")
+    print(f"Temporal features used: {temporal_features}")
     
     return X_weather, X_temporal, y
 
@@ -176,12 +210,20 @@ def save_model_and_artifacts(model, weather_scaler, temporal_scaler, metrics, ou
         'framework': 'TensorFlow.js',
         'performance': metrics,
         'input_features': {
-            'weather_features': ['temperature', 'humidity', 'wind_speed', 'pressure', 'visibility'],
+            'weather_features': ['MAGNITUDE_IMPUTED', 'duration_hours', 'DAMAGE_PROPERTY', 'INJURIES_DIRECT', 'customers_out'],
             'temporal_features': ['hour', 'day_of_week', 'month', 'is_weekend']
         },
         'preprocessing': {
             'weather_scaling': 'RobustScaler',
             'temporal_scaling': 'MinMaxScaler'
+        },
+        'data_source': 'storm_and_outage_merged_2014_2023.parquet',
+        'feature_mapping': {
+            'MAGNITUDE_IMPUTED': 'Storm magnitude (wind speed proxy)',
+            'duration_hours': 'Storm duration (weather persistence proxy)',
+            'DAMAGE_PROPERTY': 'Property damage (weather severity proxy)',
+            'INJURIES_DIRECT': 'Direct injuries (storm impact proxy)',
+            'customers_out': 'Number of customers affected (grid load proxy)'
         }
     }
     
