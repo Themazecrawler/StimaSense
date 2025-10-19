@@ -1,1 +1,65 @@
-[]
+[
+  {
+    "id": "cf2b448a2a6a50a7",
+    "region": "Power Maintenance Notice - 09.10.2025",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://www.kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-10-19T12:28:13Z"
+  },
+  {
+    "id": "2d48da7b5f9979bf",
+    "region": "Power Maintenance Notice - 02.10.2025",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://www.kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-10-19T12:28:13Z"
+  },
+  {
+    "id": "01cd9cbc142406d1",
+    "region": "Power Maintenance Notice - 25.09.2025",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://www.kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-10-19T12:28:13Z"
+  },
+  {
+    "id": "1018df6904f47ee0",
+    "region": "Power Maintenance Notice - 18.09.2025",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://www.kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-10-19T12:28:13Z"
+  },
+  {
+    "id": "53d2cf20544965d0",
+    "region": "Power Maintenance Notice - 11.09.2025",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://www.kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-10-19T12:28:13Z"
+  },
+  {
+    "id": "cde89c7d3ff2f8b4",
+    "region": "Power Maintenance Notice - 04.09.2025",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://www.kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-10-19T12:28:13Z"
+  },
+  {
+    "id": "a083423a955140f0",
+    "region": "Power Maintenance Notice - 28.08.2025",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://www.kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-10-19T12:28:13Z"
+  }
+]
