@@ -1,1 +1,56 @@
-[]
+[
+  {
+    "id": "3f435b3fdf70db12",
+    "region": "Power Maintenance Notice - 30.10.2025",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://www.kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-11-01T12:28:18Z"
+  },
+  {
+    "id": "517a9afe084c6708",
+    "region": "Power Maintenance Notice - 23.10.2025.pdf",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://www.kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-11-01T12:28:18Z"
+  },
+  {
+    "id": "2140d64b35aee5fb",
+    "region": "Power Maintenance Notice - 16.10.2025",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://www.kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-11-01T12:28:18Z"
+  },
+  {
+    "id": "cf2b448a2a6a50a7",
+    "region": "Power Maintenance Notice - 09.10.2025",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://www.kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-11-01T12:28:18Z"
+  },
+  {
+    "id": "2d48da7b5f9979bf",
+    "region": "Power Maintenance Notice - 02.10.2025",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://www.kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-11-01T12:28:18Z"
+  },
+  {
+    "id": "01cd9cbc142406d1",
+    "region": "Power Maintenance Notice - 25.09.2025",
+    "area": "Planned maintenance",
+    "startTime": "",
+    "endTime": "",
+    "sourceUrl": "https://www.kplc.co.ke/customer-support#powerschedule",
+    "createdAt": "2025-11-01T12:28:18Z"
+  }
+]
