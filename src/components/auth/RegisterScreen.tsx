@@ -12,7 +12,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../../contexts/ThemeContext';
-import { Button } from '../ui/Button';
+import { logger } from '../../observability/logger';
 import { Card, CardContent, CardHeader } from '../ui/Card';
 import { Input } from '../ui/Input';
 import { supabase } from '../../backend/supabase/SupabaseService';
@@ -65,7 +65,7 @@ export function RegisterScreen() {
       if (error) {
         Alert.alert('Registration Failed', error.message);
       } else if (data.user) {
-        console.log('User registered:', data.user.email);
+        logger.info('auth.registration_succeeded');
         Alert.alert(
           'Registration Successful', 
           'Please check your email to verify your account before logging in.',
@@ -74,7 +74,7 @@ export function RegisterScreen() {
       }
     } catch (error) {
       Alert.alert('Error', 'An unexpected error occurred');
-      console.error('Registration error:', error);
+      logger.error('auth.registration_failed', error);
     } finally {
       setLoading(false);
     }
@@ -83,7 +83,7 @@ export function RegisterScreen() {
   const handleGoogleRegister = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: 'stimasense://auth/callback'
@@ -93,12 +93,12 @@ export function RegisterScreen() {
       if (error) {
         Alert.alert('Google Registration Failed', error.message);
       } else {
-        console.log('Google OAuth initiated');
+        logger.info('auth.google_oauth_started');
         // The OAuth flow will handle the redirect
       }
     } catch (error) {
       Alert.alert('Error', 'An unexpected error occurred');
-      console.error('Google registration error:', error);
+      logger.error('auth.google_registration_failed', error);
     } finally {
       setLoading(false);
     }

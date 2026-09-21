@@ -2,10 +2,10 @@ import React from 'react';
 import {
   TouchableOpacity,
   Text,
-  StyleSheet,
   ViewStyle,
   TextStyle,
   ActivityIndicator,
+  StyleSheet,
 } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 
@@ -128,10 +128,14 @@ export function Button({
         <ActivityIndicator
           size="small"
           color={variant === 'outline' || variant === 'ghost' ? colors.foreground : colors.primaryForeground}
-          style={{ marginRight: 8 }}
+          style={styles.loadingIndicator}
         />
       )}
       <Text style={[getTextStyle(), textStyle]}>{title}</Text>
     </TouchableOpacity>
   );
 }
+
+const styles = StyleSheet.create({
+  loadingIndicator: { marginRight: 8 },
+});

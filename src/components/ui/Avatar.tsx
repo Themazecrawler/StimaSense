@@ -6,7 +6,6 @@ import {
   StyleSheet,
   ViewStyle,
   ImageStyle,
-  TextStyle,
 } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 

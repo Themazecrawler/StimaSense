@@ -5,18 +5,15 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/Feather';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../../contexts/ThemeContext';
+import { logger } from '../../observability/logger';
 import { Button } from '../ui/Button';
 import { Progress } from '../ui/Progress';
-
-const { width: screenWidth } = Dimensions.get('window');
 
 interface OnboardingStep {
   id: number;
@@ -30,51 +27,50 @@ const onboardingSteps: OnboardingStep[] = [
   {
     id: 1,
     title: 'Welcome to StimaSense',
-    description: 'Your intelligent power monitoring companion that predicts and tracks outages using AI technology.',
+    description: 'See outage information with clear source and freshness labels.',
     icon: 'zap',
     features: [
-      'AI-powered outage predictions',
-      'Real-time community updates',
-      'Smart notifications'
+      'Kenya Power notice provenance',
+      'Observation timestamps',
+      'No synthetic operational data'
     ]
   },
   {
     id: 2,
-    title: 'Community Reporting',
-    description: 'Help your community by reporting outages and sharing real-time power status updates.',
+    title: 'Planned Interruptions',
+    description: 'Review validated maintenance notices published by Kenya Power.',
     icon: 'users',
     features: [
-      'Quick outage reporting',
-      'Photo documentation',
-      'Community verification'
+      'Service-area descriptions',
+      'Scheduled start and end times',
+      'Links to official source documents'
     ]
   },
   {
     id: 3,
-    title: 'Smart Predictions',
-    description: 'Get ahead of outages with our AI system that analyzes weather, grid data, and community reports.',
-    icon: 'trending-up',
+    title: 'Weather Context',
+    description: 'View current weather observations when the provider and device location are available.',
+    icon: 'cloud',
     features: [
-      'Weather-based predictions',
-      'Grid analysis',
-      'Historical patterns'
+      'Provider attribution',
+      'Freshness indicators',
+      'Explicit unavailable states'
     ]
   },
   {
     id: 4,
-    title: 'Stay Informed',
-    description: 'Receive timely alerts and track outages on our interactive map with detailed analytics.',
-    icon: 'bell',
+    title: 'Honest Feature Status',
+    description: 'Prediction, active-outage mapping, and in-app reporting stay disabled until their operational dependencies are ready.',
+    icon: 'shield',
     features: [
-      'Real-time notifications',
-      'Interactive outage maps',
-      'Detailed analytics'
+      'No demo data in production',
+      'No unverified reports presented as fact',
+      'Clear next steps when a feature is unavailable'
     ]
   }
 ];
 
-export function OnboardingScreens() {
-  const navigation = useNavigation();
+export function OnboardingScreens({ onComplete }: { onComplete?: () => void }) {
   const { colors } = useTheme();
   const [currentStep, setCurrentStep] = useState(0);
 
@@ -93,11 +89,9 @@ export function OnboardingScreens() {
   const handleComplete = async () => {
     try {
       await AsyncStorage.setItem('isOnboarded', 'true');
-      await AsyncStorage.setItem('isAuthenticated', 'true');
-      // Move user to the main app immediately
-      (navigation as any).reset({ index: 0, routes: [{ name: 'Main' }] });
+      onComplete?.();
     } catch (error) {
-      console.error('Error completing onboarding:', error);
+      logger.error('onboarding.complete_failed', error);
     }
   };
 

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Appearance, ColorSchemeName } from 'react-native';
+import { Appearance } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { logger } from '../observability/logger';
 
 export interface ThemeColors {
   // Base colors
@@ -174,7 +175,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         setThemeType(savedTheme as ThemeType);
       }
     } catch (error) {
-      console.error('Failed to load saved theme:', error);
+      logger.error('theme.load_failed', error);
     }
   };
 
@@ -183,7 +184,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     try {
       await AsyncStorage.setItem('theme', newTheme);
     } catch (error) {
-      console.error('Failed to save theme:', error);
+      logger.error('theme.save_failed', error);
     }
   };
 

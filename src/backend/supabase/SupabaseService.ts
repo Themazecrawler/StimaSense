@@ -1,9 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { environment } from '../../config/environment';
+import { logger } from '../../observability/logger';
 
 // Supabase configuration
-const supabaseUrl = 'https://miklxxtgaglndjizgqnn.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pa2x4eHRnYWdsbmRqaXpncW5uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYxNjg4NDcsImV4cCI6MjA3MTc0NDg0N30.i57AO--wvjJ7sAZOB--QnOYTVRDbjz4ytipn3t3-1cM';
+const supabaseUrl = environment.optionalSupabaseUrl || 'https://unconfigured.invalid';
+const supabaseAnonKey = environment.optionalSupabaseAnonKey || 'unconfigured';
+
+if (!environment.isSupabaseConfigured) {
+  logger.warn('supabase.configuration_missing');
+}
 
 // Create Supabase client
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
@@ -43,19 +49,13 @@ export interface NotificationPreferences {
 export interface OutageReport {
   id: string;
   user_id: string;
-  location_lat: number;
-  location_lng: number;
-  location_address: string;
-  outage_type: 'planned' | 'unplanned' | 'weather' | 'equipment';
+  service_area: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
   description: string;
-  affected_customers?: number;
-  estimated_duration?: string;
-  status: 'active' | 'investigating' | 'resolved';
-  photos?: string[];
+  verification_status: 'unverified' | 'corroborated' | 'official';
+  moderation_status: 'pending' | 'accepted' | 'rejected';
   created_at: string;
   updated_at: string;
-  resolved_at?: string;
 }
 
 export interface WeatherData {
@@ -119,7 +119,7 @@ export class SupabaseService {
       if (!user) return null;
 
       const { data, error } = await supabase
-        .from('users')
+        .from('profiles')
         .select('*')
         .eq('id', user.id)
         .single();
@@ -127,7 +127,7 @@ export class SupabaseService {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error getting current user:', error);
+      logger.error('supabase.current_user_failed', error);
       return null;
     }
   }
@@ -138,7 +138,7 @@ export class SupabaseService {
       if (!user) throw new Error('No authenticated user');
 
       const { data, error } = await supabase
-        .from('users')
+        .from('profiles')
         .update(updates)
         .eq('id', user.id)
         .select()
@@ -147,7 +147,7 @@ export class SupabaseService {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error updating user profile:', error);
+      logger.error('supabase.profile_update_failed', error);
       return null;
     }
   }
@@ -164,27 +164,27 @@ export class SupabaseService {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error creating outage report:', error);
+      logger.error('supabase.outage_report_create_failed', error);
       return null;
     }
   }
 
-  async getOutageReports(location?: { lat: number; lng: number; radius?: number }): Promise<OutageReport[]> {
+  async getOutageReports(serviceArea?: string): Promise<OutageReport[]> {
     try {
       let query = supabase
         .from('outage_reports')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (location) {
-        query = query.eq('location_lat', location.lat).eq('location_lng', location.lng);
+      if (serviceArea?.trim()) {
+        query = query.eq('service_area', serviceArea.trim());
       }
 
       const { data, error } = await query;
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error getting outage reports:', error);
+      logger.error('supabase.outage_reports_load_failed', error);
       return [];
     }
   }
@@ -201,7 +201,7 @@ export class SupabaseService {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error saving weather data:', error);
+      logger.error('supabase.weather_save_failed', error);
       return null;
     }
   }
@@ -223,7 +223,7 @@ export class SupabaseService {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error getting weather data:', error);
+      logger.error('supabase.weather_load_failed', error);
       return [];
     }
   }
@@ -240,7 +240,7 @@ export class SupabaseService {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error saving prediction result:', error);
+      logger.error('supabase.prediction_save_failed', error);
       return null;
     }
   }
@@ -261,7 +261,7 @@ export class SupabaseService {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error getting prediction history:', error);
+      logger.error('supabase.prediction_history_failed', error);
       return [];
     }
   }
@@ -276,7 +276,7 @@ export class SupabaseService {
       if (error) throw error;
       return true;
     } catch (error) {
-      console.error('Error saving KPLC outages:', error);
+      logger.error('supabase.kplc_save_failed', error);
       return false;
     }
   }
@@ -301,7 +301,7 @@ export class SupabaseService {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error getting KPLC outages:', error);
+      logger.error('supabase.kplc_load_failed', error);
       return [];
     }
   }
@@ -318,7 +318,7 @@ export class SupabaseService {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error saving model feedback:', error);
+      logger.error('supabase.model_feedback_save_failed', error);
       return null;
     }
   }
@@ -338,7 +338,7 @@ export class SupabaseService {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error getting model feedback:', error);
+      logger.error('supabase.model_feedback_load_failed', error);
       return [];
     }
   }

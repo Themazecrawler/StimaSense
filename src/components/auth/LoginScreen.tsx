@@ -13,7 +13,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../../contexts/ThemeContext';
-import { Button } from '../ui/Button';
+import { logger } from '../../observability/logger';
 import { Card, CardContent, CardHeader } from '../ui/Card';
 import { supabase } from '../../backend/supabase/SupabaseService';
 
@@ -41,12 +41,11 @@ export function LoginScreen() {
       if (error) {
         Alert.alert('Login Failed', error.message);
       } else if (data.user) {
-        console.log('User logged in:', data.user.email);
-        navigation.navigate('Onboarding' as never);
+        logger.info('auth.login_succeeded');
       }
     } catch (error) {
       Alert.alert('Error', 'An unexpected error occurred');
-      console.error('Login error:', error);
+      logger.error('auth.login_failed', error);
     } finally {
       setLoading(false);
     }
@@ -55,7 +54,7 @@ export function LoginScreen() {
   const handleGoogleLogin = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: 'stimasense://auth/callback'
@@ -65,12 +64,12 @@ export function LoginScreen() {
       if (error) {
         Alert.alert('Google Login Failed', error.message);
       } else {
-        console.log('Google OAuth initiated');
+        logger.info('auth.google_oauth_started');
         // The OAuth flow will handle the redirect
       }
     } catch (error) {
       Alert.alert('Error', 'An unexpected error occurred');
-      console.error('Google login error:', error);
+      logger.error('auth.google_login_failed', error);
     } finally {
       setLoading(false);
     }

@@ -7,7 +7,7 @@ interface SeparatorProps {
   className?: string;
 }
 
-export function Separator({ orientation = 'horizontal', className }: SeparatorProps) {
+export function Separator({ orientation = 'horizontal', className: _className }: SeparatorProps) {
   const { colors } = useTheme();
   
   const styles = StyleSheet.create({

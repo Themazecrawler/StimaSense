@@ -1,0 +1,44 @@
+{
+  "exceptions": [
+    {
+      "package": "image-size",
+      "severity": "high",
+      "advisories": ["GHSA-w3rx-r6r6-pgpr", "GHSA-5p2g-fcmc-qvqq"],
+      "justification": "Transitive Metro parser code is build tooling and does not process user-supplied images in the shipped app.",
+      "owner": "mobile-maintainers",
+      "expires": "2026-12-21"
+    },
+    {
+      "package": "metro",
+      "severity": "high",
+      "transitiveVia": ["image-size", "metro-config", "metro-transform-worker"],
+      "justification": "Transitive finding inherited from the React Native 0.81 Metro toolchain; upgrade with the React Native release line.",
+      "owner": "mobile-maintainers",
+      "expires": "2026-12-21"
+    },
+    {
+      "package": "metro-config",
+      "severity": "high",
+      "transitiveVia": ["metro"],
+      "justification": "Transitive finding inherited from Metro; replacement is coupled to the React Native release line.",
+      "owner": "mobile-maintainers",
+      "expires": "2026-12-21"
+    },
+    {
+      "package": "metro-transform-worker",
+      "severity": "high",
+      "transitiveVia": ["metro"],
+      "justification": "Transitive finding inherited from Metro; replacement is coupled to the React Native release line.",
+      "owner": "mobile-maintainers",
+      "expires": "2026-12-21"
+    },
+    {
+      "package": "postcss",
+      "severity": "high",
+      "advisories": ["GHSA-qx2v-qp2m-jg93", "GHSA-6g55-p6wh-862q", "GHSA-fxqj-rqcc-2cmp", "GHSA-r28c-9q8g-f849"],
+      "justification": "Pulled through TensorFlow.js React Native's Expo conversion tooling and not used to parse untrusted CSS at runtime.",
+      "owner": "ml-maintainers",
+      "expires": "2026-12-21"
+    }
+  ]
+}

@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   TextInput,
-  View,
   StyleSheet,
   ViewStyle,
   TextStyle,
