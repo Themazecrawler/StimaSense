@@ -1,6 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { federatedLearningService } from './FederatedLearningService';
-import { mlService } from './MLService';
+import { logger } from '../../src/observability/logger';
 
 export interface FeedbackData {
   predictionId: string;
@@ -117,25 +116,11 @@ class ModelFeedbackService {
 
       await this.saveFeedback();
 
-      // Send to federated learning service
-      await federatedLearningService.addTrainingDataFromReport(
-        predictionId,
-        feedback.actualOutcome.hadOutage,
-        feedback.actualOutcome.outageDetails,
-        {
-          reportedAt: feedback.timestamp,
-          accuracy: feedback.predictionFeedback.accuracyRating,
-          confidence: feedback.predictionFeedback.confidenceInFeedback,
-          hasPhotos: feedback.context.hasPhotos,
-          verified: feedback.actualOutcome.verificationConfidence > 0.7,
-        }
-      );
-
-      console.log('Feedback submitted successfully:', feedback.predictionId);
+      logger.info('model.feedback_submitted');
       return feedback.predictionId;
 
     } catch (error) {
-      console.error('Failed to submit feedback:', error);
+      logger.error('model.feedback_submit_failed', error);
       throw error;
     }
   }
@@ -170,7 +155,7 @@ class ModelFeedbackService {
       );
 
     } catch (error) {
-      console.error('Failed to submit automatic feedback:', error);
+      logger.error('model.automatic_feedback_failed', error);
     }
   }
 
@@ -194,11 +179,11 @@ class ModelFeedbackService {
         );
         importedCount++;
       } catch (error) {
-        console.warn('Failed to import feedback item:', error);
+        logger.warn('model.feedback_import_item_skipped', { reason: error instanceof Error ? error.name : 'invalid_item' });
       }
     }
 
-    console.log(`Imported ${importedCount} feedback items`);
+    logger.info('model.feedback_imported', { importedCount });
     return importedCount;
   }
 
@@ -309,7 +294,7 @@ class ModelFeedbackService {
       }));
 
     } catch (error) {
-      console.error('Failed to get pending feedback requests:', error);
+      logger.error('model.pending_feedback_load_failed', error);
       return [];
     }
   }
@@ -329,7 +314,7 @@ class ModelFeedbackService {
         await AsyncStorage.setItem('prediction_history', JSON.stringify(predictions));
       }
     } catch (error) {
-      console.error('Failed to mark feedback requested:', error);
+      logger.error('model.feedback_request_update_failed', error);
     }
   }
 
@@ -360,7 +345,7 @@ class ModelFeedbackService {
         return [headers, ...csvData].map(row => row.join(',')).join('\n');
       }
     } catch (error) {
-      console.error('Failed to export feedback data:', error);
+      logger.error('model.feedback_export_failed', error);
       return '';
     }
   }
@@ -372,7 +357,7 @@ class ModelFeedbackService {
       const predictions = predictionHistory ? JSON.parse(predictionHistory) : [];
       return predictions.find((p: any) => p.id === predictionId);
     } catch (error) {
-      console.error('Failed to get original prediction:', error);
+      logger.error('model.original_prediction_load_failed', error);
       return null;
     }
   }
@@ -381,7 +366,7 @@ class ModelFeedbackService {
     try {
       let userId = await AsyncStorage.getItem('user_id');
       if (!userId) {
-        userId = `user_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+        userId = `local_user_${Date.now()}`;
         await AsyncStorage.setItem('user_id', userId);
       }
       return userId;
@@ -431,16 +416,12 @@ class ModelFeedbackService {
     return Math.max(1, Math.min(5, Math.round(rating)));
   }
 
-  private calculateTimingAccuracy(predictionId: string, outageData: any): number {
-    // Simplified timing accuracy calculation
-    // In reality, would compare predicted time window with actual outage time
-    return Math.random() > 0.5 ? 1 : 0;
+  private calculateTimingAccuracy(_predictionId: string, _outageData: any): number {
+    return 0;
   }
 
-  private calculateSeverityMatch(predictionId: string, outageData: any): number {
-    // Simplified severity matching
-    // In reality, would compare predicted severity with actual severity
-    return Math.random() > 0.5 ? 1 : 0;
+  private calculateSeverityMatch(_predictionId: string, _outageData: any): number {
+    return 0;
   }
 
   private hasFeedback(predictionId: string): boolean {
@@ -521,7 +502,7 @@ class ModelFeedbackService {
         }));
       }
     } catch (error) {
-      console.error('Failed to load feedback data:', error);
+      logger.error('model.feedback_storage_load_failed', error);
     }
   }
 
@@ -532,7 +513,7 @@ class ModelFeedbackService {
         JSON.stringify(this.feedbackData)
       );
     } catch (error) {
-      console.error('Failed to save feedback data:', error);
+      logger.error('model.feedback_storage_save_failed', error);
     }
   }
 }

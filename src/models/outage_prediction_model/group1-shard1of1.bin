@@ -1,3 +1,0 @@
-# This is a placeholder binary weights file
-# In a real implementation, this would contain the actual model weights
-# For now, we'll use the fallback model creation in TensorFlowMLService
