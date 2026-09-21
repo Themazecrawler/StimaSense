@@ -1,0 +1,3 @@
+# Run operational models on-device
+
+StimaSense will produce Live Predictions on-device from one versioned TensorFlow.js artifact and its matching preprocessing metadata, preserving useful behavior during unreliable connectivity and fitting the existing mobile architecture. Backend inference remains a future option, but the app must treat a missing, incompatible, or unvalidated artifact as unavailable rather than substituting a heuristic or Demo Prediction; the current US storm model is therefore a Research Model until its observable pre-event feature contract and Kenyan validation support operational use.

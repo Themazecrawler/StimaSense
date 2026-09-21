@@ -1,387 +1,171 @@
 # StimaSense
 
-A React Native application for intelligent power outage prediction and monitoring using machine learning and real-time data analysis.
+StimaSense is a React Native application for sourced electricity-interruption information in Kenya. It currently supports live WeatherAPI observations and validated Kenya Power planned-interruption notices. It deliberately does **not** produce outage-risk predictions until a model trained and validated for Kenyan service areas is available.
 
-## Overview
+## Capability status
 
-StimaSense is a comprehensive power monitoring solution that combines artificial intelligence with real-time data to predict and monitor power outages. The application provides users with personalized alerts, outage reporting capabilities, and detailed analytics to help manage power-related issues effectively.
+| Capability | Status | Source of truth |
+| --- | --- | --- |
+| Current weather | Available when configured and location permission is granted | WeatherAPI observation and provider timestamp |
+| Planned interruptions | Available only when the scraper produces complete, current notices | Kenya Power source URL and time window |
+| Live outage predictions | Unavailable | No Operational Model exists |
+| Active-outage map | Unavailable | No verified geospatial outage feed exists |
+| Community reporting | Disabled | Schema exists, but deployment/moderation must be completed first |
+| Synthetic data | Internal development only | Never substituted into production states |
 
-## Features
+Unavailable dependencies affect only their features. The app renders explicit loading, stale, unavailable, and error states instead of inventing operational data.
 
-### Core Functionality
-- **AI-Powered Outage Prediction**: Machine learning models analyze weather, grid, and temporal data to predict potential power outages
-- **Real-Time Monitoring**: Continuous monitoring of power grid status and environmental conditions
-- **Personalized Alerts**: Location-based notifications for planned outages and predicted issues
-- **Outage Reporting**: Community-driven outage reporting system with detailed categorization
-- **Interactive Maps**: Visual representation of outage locations and affected areas
-- **Analytics Dashboard**: Comprehensive analytics and historical data visualization
+## Requirements
 
-### Technical Features
-- **TensorFlow.js Integration**: On-device machine learning for real-time predictions
-- **Supabase Backend**: Scalable cloud database and authentication system
-- **Location Services**: GPS-based location detection and reverse geocoding
-- **Push Notifications**: Real-time alerts for critical power events
-- **Offline Support**: Cached predictions and data for offline functionality
-- **Federated Learning**: Continuous model improvement through user feedback
+- Node.js 20.19.4 or newer
+- npm and the React Native Android/iOS prerequisites
+- JDK 17 and Android Studio for Android builds
+- Xcode and CocoaPods for iOS builds
+- Python 3.11 for training and scraper validation
 
-## Technology Stack
+## Local setup
 
-### Frontend
-- **React Native**: Cross-platform mobile application framework
-- **TypeScript**: Type-safe JavaScript development
-- **React Navigation**: Navigation and routing system
-- **TensorFlow.js**: Machine learning framework for React Native
-- **React Native Vector Icons**: Icon library for UI components
-
-### Backend & Services
-- **Supabase**: Backend-as-a-Service for database, authentication, and storage
-- **PostgreSQL**: Primary database for user data and outage records
-- **Supabase Storage**: File storage for ML models and data files
-- **React Native Geolocation**: Location services and GPS integration
-
-### Machine Learning
-- **TensorFlow.js**: Neural network framework for outage prediction
-- **Custom ML Models**: Trained models for weather, grid, and temporal analysis
-- **Federated Learning**: Distributed learning system for model improvement
-- **Auto Prediction Service**: Automated prediction generation and updates
-
-### Development Tools
-- **Metro Bundler**: JavaScript bundler for React Native
-- **Android SDK**: Android development tools and emulator
-- **Gradle**: Build system for Android applications
-- **TypeScript Compiler**: Type checking and compilation
-
-## Installation
-
-### Prerequisites
-- Node.js (v16 or higher)
-- Java Development Kit (JDK 17)
-- Android Studio with Android SDK
-- React Native CLI
-- Physical Android device or emulator
-
-### Environment Setup
-
-1. **Install Node.js and npm**
-   ```bash
-   # Download and install Node.js from https://nodejs.org/
-   ```
-
-2. **Install Java Development Kit**
-   ```bash
-   # Download JDK 17 from Oracle or use OpenJDK
-   # Set JAVA_HOME environment variable
-   ```
-
-3. **Install Android Studio and SDK**
-   ```bash
-   # Download Android Studio from https://developer.android.com/
-   # Install Android SDK Platform-Tools
-   # Set ANDROID_HOME environment variable
-   ```
-
-4. **Install React Native CLI**
-   ```bash
-   npm install -g @react-native-community/cli
-   ```
-
-### Project Setup
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd StimaSense
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Configure environment variables**
-   ```bash
-   # Create .env file with your Supabase credentials
-   SUPABASE_URL=your_supabase_url
-   SUPABASE_ANON_KEY=your_supabase_anon_key
-   ```
-
-4. **Configure Android settings**
-   ```bash
-   # Add Google Maps API key to android/app/src/main/AndroidManifest.xml
-   # Configure adb for device connection
-   ```
-
-## Configuration
-
-### Supabase Setup
-1. Create a Supabase project at https://supabase.com
-2. Set up database tables for users, outages, and predictions
-3. Configure authentication providers (email, Google OAuth)
-4. Set up storage buckets for ML models and data files
-5. Configure row-level security policies
-
-### Google Maps API
-1. Create a Google Cloud project
-2. Enable Maps SDK for Android
-3. Generate API key and add to AndroidManifest.xml
-4. Configure API key restrictions for security
-
-### ML Model Configuration
-1. Upload trained TensorFlow.js models to Supabase Storage
-2. Ensure model.json and weight files are in the same directory
-3. Configure model URLs in src/config/model.ts
-4. Test model loading and prediction functionality
-
-## Usage
-
-### Running the Application
-
-1. **Start Metro bundler**
-   ```bash
-   npx react-native start --reset-cache --port 8081
-   ```
-
-2. **Run on Android device**
-   ```bash
-   npx react-native run-android
-   ```
-
-3. **Enable USB debugging on device**
-   - Go to Settings > Developer options
-   - Enable USB debugging
-   - Connect device via USB
-
-### Development Workflow
-
-1. **Code changes**: Edit TypeScript/JavaScript files
-2. **Hot reload**: Changes automatically reflect in the app
-3. **Debugging**: Use React Native Debugger or Chrome DevTools
-4. **Testing**: Run tests with `npm test`
-
-## Project Structure
-
-```
-StimaSense/
-├── android/                 # Android-specific configuration
-├── ios/                     # iOS-specific configuration (if applicable)
-├── src/
-│   ├── components/         # React components
-│   │   ├── auth/           # Authentication screens
-│   │   ├── onboarding/     # Onboarding flow
-│   │   ├── screens/        # Main application screens
-│   │   └── ui/             # Reusable UI components
-│   ├── contexts/          # React contexts (theme, auth)
-│   ├── backend/           # Backend services
-│   │   ├── supabase/      # Supabase configuration
-│   │   ├── kplc/          # KPLC outage service
-│   │   └── background/   # Background task services
-│   ├── services/          # Business logic services
-│   │   └── ml/            # Machine learning services
-│   ├── utils/             # Utility functions
-│   ├── config/            # Configuration files
-│   └── models/            # ML model files
-├── services/              # Core services
-│   └── ml/                # ML service implementations
-├── App.tsx                # Main application component
-├── index.js               # Application entry point
-└── package.json           # Dependencies and scripts
-```
-
-## Machine Learning Architecture
-
-### Model Structure
-- **Multi-input Neural Network**: Processes weather, grid, temporal, and sequence data
-- **Input Features**:
-  - Weather features (temperature, humidity, wind speed, pressure, visibility)
-  - Grid features (load, capacity, reliability, voltage, frequency)
-  - Temporal features (hour, day of week, month, weekend flag)
-  - Sequence features (24 timesteps of historical data)
-
-### Prediction Pipeline
-1. **Data Collection**: Gather real-time weather and grid data
-2. **Feature Engineering**: Process and normalize input features
-3. **Model Inference**: Run TensorFlow.js model predictions
-4. **Post-processing**: Convert predictions to risk levels and time windows
-5. **Alert Generation**: Create personalized notifications based on predictions
-
-### Federated Learning
-- **Local Training**: User devices contribute to model improvement
-- **Privacy-Preserving**: Training data never leaves the device
-- **Continuous Learning**: Models improve over time with user feedback
-- **Aggregation**: Central server aggregates model updates
-
-## API Reference
-
-### Core Services
-
-#### MLService
-```typescript
-interface MLService {
-  initializeModel(): Promise<boolean>;
-  predictOutage(input: OutagePredictionInput): Promise<ModelOutputs>;
-  getModelStatus(): ModelStatus;
-}
-```
-
-#### AutoPredictionService
-```typescript
-interface AutoPredictionService {
-  startAutoPredictions(): Promise<void>;
-  getCurrentPrediction(): LivePrediction | null;
-  forceUpdate(): Promise<void>;
-  getStatus(): AutoPredictionStatus;
-}
-```
-
-#### KPLCPlannedOutageService
-```typescript
-interface KPLCPlannedOutageService {
-  initialize(url?: string): Promise<void>;
-  filterForUserArea(area: string): PlannedOutage[];
-  setUserArea(area: string): void;
-  getOutages(): PlannedOutage[];
-}
-```
-
-### Data Models
-
-#### LivePrediction
-```typescript
-interface LivePrediction {
-  id: string;
-  timestamp: Date;
-  location: { latitude: number; longitude: number; address?: string };
-  prediction: {
-    riskLevel: 'low' | 'medium' | 'high' | 'critical';
-    probability: number;
-    confidence: number;
-    timeWindow: string;
-    factors: { weather: number; grid: number; historical: number };
-  };
-  environmentalData: EnvironmentalData;
-  recommendations: string[];
-  nextUpdateAt: Date;
-  modelVersion: string;
-}
-```
-
-#### OutageReport
-```typescript
-interface OutageReport {
-  id: string;
-  userId: string;
-  location: { latitude: number; longitude: number; address: string };
-  outageType: 'planned' | 'unplanned' | 'maintenance';
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  description: string;
-  estimatedDuration: number;
-  timestamp: Date;
-  status: 'active' | 'resolved' | 'pending';
-}
-```
-
-## Deployment
-
-### Production Build
-1. **Generate signed APK**
-   ```bash
-   cd android
-   ./gradlew assembleRelease
-   ```
-
-2. **Configure ProGuard** (optional)
-   - Enable code obfuscation
-   - Optimize bundle size
-   - Protect sensitive code
-
-3. **Test thoroughly**
-   - Test on multiple devices
-   - Verify all features work correctly
-   - Check performance and memory usage
-
-### App Store Deployment
-1. **Create developer account**
-2. **Prepare store listing**
-3. **Submit for review**
-4. **Monitor analytics and feedback**
-
-## Troubleshooting
-
-### Common Issues
-
-#### Metro Bundler Issues
 ```bash
-# Clear Metro cache
-npx react-native start --reset-cache
-
-# Kill existing processes
-taskkill /f /im node.exe
+git clone https://github.com/Themazecrawler/StimaSense.git
+cd StimaSense
+npm ci
+cp .env.example .env
 ```
 
-#### Android Build Issues
+Configure `.env`:
+
+```dotenv
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your_public_anon_key
+WEATHER_API_KEY=your_weatherapi_key
+GOOGLE_MAPS_API_KEY=your_restricted_android_key
+SENTRY_DSN=
+APP_ENVIRONMENT=development
+DEMO_MODE=false
+```
+
+`DEMO_MODE` is honored only by development builds. Production code contains no synthetic operational fallback.
+
+Apply [the Supabase migration](supabase/migrations/20260921000000_initial_security.sql) before enabling profiles or community reports. It creates the reproducible schema and row-level-security policies. Community submission remains disabled until deployment and moderation are verified.
+
+Run the app:
+
 ```bash
-# Clean Android build
-cd android && ./gradlew clean
-
-# Check Java version
-java -version
-
-# Verify environment variables
-echo $JAVA_HOME
-echo $ANDROID_HOME
+npm start
+npm run android
+# or, on macOS
+npm run ios
 ```
 
-#### TensorFlow.js Issues
+## Verification
+
 ```bash
-# Check model loading
-# Verify model files exist in Supabase Storage
-# Check network connectivity
-# Review console logs for detailed error messages
+npm run lint
+npm run typecheck
+npm run test:ci
+npm run audit
+python -m unittest discover -s services/prediction/tests -v
+python -m unittest discover -s services/kplc/scraper/tests -v
 ```
 
-#### Location Services Issues
+CI runs these gates on pushes to `main` and pull requests, then compiles an Android debug application. Dependency audit exceptions are machine-readable in `security-audit-exceptions.json`; new or expired high/critical findings fail CI.
+
+## Runtime architecture
+
+```text
+Screens
+  ├─ WeatherService ── WeatherAPI
+  ├─ KPLCPlannedOutageService ── validated bundled/remote snapshot
+  ├─ Supabase client ── auth, profiles, protected report schema
+  └─ prediction boundary ── unavailable until Operational Model admission
+
+Observability
+  ├─ structured event logger
+  └─ optional Sentry adapter (PII and tracing disabled)
+```
+
+Screens render state; backend modules own external I/O; ML modules own model eligibility and inference. See [CONTEXT.md](CONTEXT.md) for canonical domain language and [architecture decisions](docs/adr/) for the rationale.
+
+## Data truth and freshness
+
+- Current weather is considered fresh for 30 minutes using the provider observation timestamp.
+- Stale observations remain visibly labelled; they never become current by being rewrapped locally.
+- KPLC entries require a region, area, HTTPS source, and valid start/end timestamps. Invalid or empty runs fail without overwriting the prior snapshot.
+- A Planned Interruption Notice confirms a utility schedule, not a currently active outage.
+- Location failure never substitutes Nairobi, San Francisco, or another default coordinate.
+
+## Observability
+
+Set `SENTRY_DSN` in production to enable error reporting. The logger redacts fields whose names indicate credentials, identity, feedback content, or precise coordinates. Sentry default PII collection and performance tracing are disabled. Without a DSN, structured development logs continue locally and the app remains usable.
+
+## Research model reproduction
+
+The current training pipeline is research-only. Its dataset is US storm/outage data, contains no Kenyan observations, uses post-event proxy fields, and is unsuitable for live Kenyan prediction.
+
+Install the locked environment and run tests:
+
 ```bash
-# Check permissions
-# Verify GPS is enabled
-# Test with different location providers
-# Review timeout settings
+python -m pip install -r services/prediction/requirements.lock
+python -m unittest discover -s services/prediction/tests -v
+python services/prediction/train_from_parquet.py \
+  --input services/prediction/data/storm_and_outage_merged_2014_2023.parquet \
+  --output models \
+  --seed 42 \
+  --epochs 50 \
+  --batch-size 32 \
+  --test-size 0.2
 ```
 
-### Debug Mode
-- Enable React Native Debugger
-- Use Chrome DevTools for debugging
-- Monitor console logs for errors
-- Check network requests in Network tab
+Training writes metrics and metadata under `models/`. Rebuild the lock only when dependencies intentionally change:
 
-## Contributing
+```bash
+uv pip compile services/prediction/requirements.txt \
+  --output-file services/prediction/requirements.lock \
+  --generate-hashes \
+  --python-version 3.11
+```
 
-### Development Guidelines
-1. **Code Style**: Follow TypeScript best practices
-2. **Testing**: Write unit tests for new features
-3. **Documentation**: Update documentation for API changes
-4. **Code Review**: Submit pull requests for review
+Read [the model card](models/MODEL_CARD.md) before interpreting any metric. Aggregate accuracy is especially misleading because the current research label is profoundly imbalanced.
 
-### Branch Strategy
-- `main`: Production-ready code
-- `develop`: Development branch
-- `feature/*`: Feature development branches
-- `hotfix/*`: Critical bug fixes
+## Operational-model admission
 
-## License
+A Research Model may become an Operational Model only when it has:
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+- documented Kenyan dataset provenance and license;
+- runtime-obtainable pre-event features with matching preprocessing metadata;
+- temporal and geographic holdouts;
+- precision, recall, PR-AUC, calibration, and simple-baseline comparisons;
+- thresholds selected from measured alert costs and class balance;
+- a deterministic training-to-mobile artifact round-trip test;
+- a versioned model bundle reviewed with an application release.
 
-## Support
+Until then, prediction methods reject inference and the UI says prediction is unavailable.
 
-For support and questions:
-- Create an issue in the GitHub repository
-- Check the troubleshooting section
-- Review the documentation
-- Contact the development team
+## KPLC ingestion
 
-## Acknowledgments
+The scheduled workflow installs `services/kplc/scraper/requirements.txt`, tests validation, fetches Kenya Power notices, and mirrors one validated snapshot into `models/` and `src/models/`. Fetch, parse, or data-quality failures exit non-zero and preserve the last valid commit.
 
-- React Native community for the excellent framework
-- Supabase team for the powerful backend platform
-- TensorFlow.js team for the ML framework
-- All contributors and beta testers
+Run locally:
+
+```bash
+python -m pip install -r services/kplc/scraper/requirements.txt
+python services/kplc/scraper/fetch_kplc_planned_outages.py \
+  models/planned_outages.json \
+  --mirror src/models/planned_outages.json
+```
+
+## Security notes
+
+- Never commit `.env`; only `.env.example` is tracked.
+- Previously committed WeatherAPI and Google Maps credentials must be rotated before release.
+- Restrict the Google Maps key by application ID/signing certificate and enabled APIs.
+- Treat the Supabase anon key as a public client credential; authorization depends on deployed RLS policies.
+- Git history is not rewritten by default after rotation.
+
+## Release checklist
+
+1. Rotate and restrict previously exposed provider credentials.
+2. Deploy and verify Supabase migrations/RLS.
+3. Supply production environment values through the build/CI secret store.
+4. Confirm lint, typecheck, coverage, audit policy, Python tests, and Android build are green from a fresh clone.
+5. Confirm production screens contain no demo data and every external record exposes provenance and time.

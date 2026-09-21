@@ -4,18 +4,48 @@ Train outage prediction model from parquet data for StimaSense GitHub workflow.
 """
 
 import argparse
+import hashlib
 import os
 import sys
 import json
+import random
+from datetime import datetime, timezone
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import RobustScaler, MinMaxScaler
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-import tensorflow as tf
-from tensorflow import keras
-import tensorflowjs as tfjs
+
+WEATHER_FEATURES = [
+    'MAGNITUDE_IMPUTED',
+    'duration_hours',
+    'DAMAGE_PROPERTY',
+    'INJURIES_DIRECT',
+    'DAMAGE_CROPS',
+]
+TEMPORAL_FEATURES = ['hour', 'day_of_week', 'month', 'is_weekend']
+
+
+def sha256_file(path, chunk_size=1024 * 1024):
+    digest = hashlib.sha256()
+    with open(path, 'rb') as source:
+        for chunk in iter(lambda: source.read(chunk_size), b''):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def configure_reproducibility(seed):
+    """Seed Python, NumPy, and TensorFlow and request deterministic operations."""
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    os.environ['TF_DETERMINISTIC_OPS'] = '1'
+    random.seed(seed)
+    np.random.seed(seed)
+
+    import tensorflow as tf
+
+    tf.keras.utils.set_random_seed(seed)
+    try:
+        tf.config.experimental.enable_op_determinism()
+    except (AttributeError, RuntimeError):
+        # Older TensorFlow builds may not expose deterministic-op configuration.
+        pass
 
 def load_and_preprocess_data(input_path):
     """Load and preprocess the parquet data."""
@@ -36,36 +66,20 @@ def load_and_preprocess_data(input_path):
     # Create outage target variable (1 if customers_out > 0, 0 otherwise)
     df['outage_occurred'] = (df['customers_out'] > 0).astype(int)
     
-    # Use available storm/weather features as proxies
-    # MAGNITUDE_IMPUTED represents storm intensity (wind speed proxy)
-    # DAMAGE_PROPERTY represents storm severity (weather impact proxy)
-    # duration_hours represents storm duration
-    
     # Fill missing values with medians
     df['MAGNITUDE_IMPUTED'] = df['MAGNITUDE_IMPUTED'].fillna(df['MAGNITUDE_IMPUTED'].median())
     df['DAMAGE_PROPERTY'] = df['DAMAGE_PROPERTY'].fillna(0)
+    df['DAMAGE_CROPS'] = df['DAMAGE_CROPS'].fillna(0)
     df['duration_hours'] = df['duration_hours'].fillna(df['duration_hours'].median())
     df['customers_out'] = df['customers_out'].fillna(0)
-    
-    # Create weather-like features from available data
-    weather_features = [
-        'MAGNITUDE_IMPUTED',  # Storm magnitude (wind speed proxy)
-        'duration_hours',     # Storm duration (weather persistence proxy) 
-        'DAMAGE_PROPERTY',    # Property damage (weather severity proxy)
-        'INJURIES_DIRECT',    # Direct injuries (storm impact proxy)
-        'customers_out'       # Number of customers affected (grid load proxy)
-    ]
-    
+
     # Fill remaining missing values
-    for feature in weather_features:
+    for feature in WEATHER_FEATURES:
         df[feature] = df[feature].fillna(0)
-    
-    # Extract temporal features  
-    temporal_features = ['hour', 'day_of_week', 'month', 'is_weekend']
-    
+
     # Create feature matrices
-    X_weather = df[weather_features].values
-    X_temporal = df[temporal_features].values
+    X_weather = df[WEATHER_FEATURES].values
+    X_temporal = df[TEMPORAL_FEATURES].values
     
     # Target variable
     y = df['outage_occurred'].values
@@ -73,13 +87,14 @@ def load_and_preprocess_data(input_path):
     print(f"Weather features shape: {X_weather.shape}")
     print(f"Temporal features shape: {X_temporal.shape}")
     print(f"Target distribution: {np.bincount(y)}")
-    print(f"Weather features used: {weather_features}")
-    print(f"Temporal features used: {temporal_features}")
+    print(f"Weather features used: {WEATHER_FEATURES}")
+    print(f"Temporal features used: {TEMPORAL_FEATURES}")
     
     return X_weather, X_temporal, y
 
 def create_model(weather_input_dim, temporal_input_dim):
     """Create neural network model."""
+    from tensorflow import keras
     
     # Weather input branch
     weather_input = keras.Input(shape=(weather_input_dim,), name='weather_input')
@@ -110,13 +125,18 @@ def create_model(weather_input_dim, temporal_input_dim):
     
     return model
 
-def train_model(X_weather, X_temporal, y):
+def train_model(X_weather, X_temporal, y, seed, epochs, batch_size, test_size):
     """Train the model."""
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+    from sklearn.model_selection import train_test_split
+    from sklearn.preprocessing import RobustScaler, MinMaxScaler
+
     print("Preparing data for training...")
     
     # Split data
     X_weather_train, X_weather_test, X_temporal_train, X_temporal_test, y_train, y_test = train_test_split(
-        X_weather, X_temporal, y, test_size=0.2, random_state=42, stratify=y
+        X_weather, X_temporal, y, test_size=test_size, random_state=seed, stratify=y
     )
     
     # Scale features
@@ -137,9 +157,10 @@ def train_model(X_weather, X_temporal, y):
     # Train model
     history = model.fit(
         [X_weather_train_scaled, X_temporal_train_scaled], y_train,
-        epochs=50,
-        batch_size=32,
+        epochs=epochs,
+        batch_size=batch_size,
         validation_split=0.2,
+        shuffle=True,
         verbose=1
     )
     
@@ -149,25 +170,65 @@ def train_model(X_weather, X_temporal, y):
     y_pred = (predictions > 0.5).astype(int).flatten()
     
     accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred)
-    recall = recall_score(y_test, y_pred)
-    f1 = f1_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred, zero_division=0)
+    recall = recall_score(y_test, y_pred, zero_division=0)
+    f1 = f1_score(y_test, y_pred, zero_division=0)
+    loss = float(model.evaluate(
+        [X_weather_test_scaled, X_temporal_test_scaled],
+        y_test,
+        verbose=0,
+    )[0])
+
+    baseline = RandomForestClassifier(
+        n_estimators=100,
+        class_weight='balanced',
+        n_jobs=1,
+        random_state=seed,
+    )
+    baseline_train = np.concatenate([X_weather_train_scaled, X_temporal_train_scaled], axis=1)
+    baseline_test = np.concatenate([X_weather_test_scaled, X_temporal_test_scaled], axis=1)
+    baseline.fit(baseline_train, y_train)
+    baseline_predictions = baseline.predict(baseline_test)
+    baseline_metrics = {
+        'accuracy': float(accuracy_score(y_test, baseline_predictions)),
+        'precision': float(precision_score(y_test, baseline_predictions, zero_division=0)),
+        'recall': float(recall_score(y_test, baseline_predictions, zero_division=0)),
+        'f1_score': float(f1_score(y_test, baseline_predictions, zero_division=0)),
+    }
     
     print(f"Model Performance:")
     print(f"Accuracy: {accuracy:.3f}")
     print(f"Precision: {precision:.3f}")
     print(f"Recall: {recall:.3f}")
     print(f"F1 Score: {f1:.3f}")
+    print(f"Loss: {loss:.3f}")
+    print(f"Random forest baseline F1: {baseline_metrics['f1_score']:.3f}")
     
     return model, weather_scaler, temporal_scaler, {
-        'accuracy': accuracy,
-        'precision': precision,
-        'recall': recall,
-        'f1_score': f1
+        'accuracy': float(accuracy),
+        'precision': float(precision),
+        'recall': float(recall),
+        'f1_score': float(f1),
+        'loss': loss,
+        'baseline': baseline_metrics,
+        'epochs': epochs,
+        'batch_size': batch_size,
+        'test_size': test_size,
+        'final_training_loss': float(history.history['loss'][-1]),
+        'final_validation_loss': float(history.history['val_loss'][-1]),
     }
 
-def save_model_and_artifacts(model, weather_scaler, temporal_scaler, metrics, output_dir):
+def save_model_and_artifacts(
+    model,
+    weather_scaler,
+    temporal_scaler,
+    metrics,
+    output_dir,
+    input_path,
+    seed,
+):
     """Save model and preprocessing artifacts."""
+    import tensorflowjs as tfjs
     
     os.makedirs(output_dir, exist_ok=True)
     
@@ -202,28 +263,39 @@ def save_model_and_artifacts(model, weather_scaler, temporal_scaler, metrics, ou
     
     with open(os.path.join(output_dir, 'preprocessing_params.json'), 'w') as f:
         json.dump(preprocessing_params, f, indent=2)
+
+    metrics_artifact = {
+        **metrics,
+        'seed': seed,
+        'input_file': os.path.basename(input_path),
+        'input_sha256': sha256_file(input_path),
+    }
+    with open(os.path.join(output_dir, 'metrics.json'), 'w') as f:
+        json.dump(metrics_artifact, f, indent=2)
     
     # Save model metadata
     metadata = {
         'model_version': '1.0.0',
-        'created_at': pd.Timestamp.now().isoformat(),
+        'created_at': datetime.now(timezone.utc).isoformat(),
         'framework': 'TensorFlow.js',
-        'performance': metrics,
+        'performance': metrics_artifact,
         'input_features': {
-            'weather_features': ['MAGNITUDE_IMPUTED', 'duration_hours', 'DAMAGE_PROPERTY', 'INJURIES_DIRECT', 'customers_out'],
-            'temporal_features': ['hour', 'day_of_week', 'month', 'is_weekend']
+            'weather_features': WEATHER_FEATURES,
+            'temporal_features': TEMPORAL_FEATURES,
         },
         'preprocessing': {
             'weather_scaling': 'RobustScaler',
             'temporal_scaling': 'MinMaxScaler'
         },
-        'data_source': 'storm_and_outage_merged_2014_2023.parquet',
+        'data_source': os.path.basename(input_path),
+        'data_sha256': metrics_artifact['input_sha256'],
+        'seed': seed,
         'feature_mapping': {
             'MAGNITUDE_IMPUTED': 'Storm magnitude (wind speed proxy)',
             'duration_hours': 'Storm duration (weather persistence proxy)',
             'DAMAGE_PROPERTY': 'Property damage (weather severity proxy)',
             'INJURIES_DIRECT': 'Direct injuries (storm impact proxy)',
-            'customers_out': 'Number of customers affected (grid load proxy)'
+            'DAMAGE_CROPS': 'Crop damage (weather severity proxy)'
         }
     }
     
@@ -234,26 +306,64 @@ def save_model_and_artifacts(model, weather_scaler, temporal_scaler, metrics, ou
     print(f"- TensorFlow.js model: {model_dir}")
     print(f"- Preprocessing params: {os.path.join(output_dir, 'preprocessing_params.json')}")
     print(f"- Model metadata: {os.path.join(output_dir, 'model_metadata.json')}")
+    print(f"- Metrics: {os.path.join(output_dir, 'metrics.json')}")
 
-def main():
+def parse_args(argv=None):
     parser = argparse.ArgumentParser(description='Train outage prediction model')
     parser.add_argument('--input', required=True, help='Path to input parquet file')
     parser.add_argument('--output', required=True, help='Output directory for model artifacts')
-    
-    args = parser.parse_args()
-    
+    parser.add_argument('--seed', type=int, default=42, help='Random seed (default: 42)')
+    parser.add_argument('--epochs', type=int, default=50, help='Training epochs (default: 50)')
+    parser.add_argument('--batch-size', type=int, default=32, help='Training batch size (default: 32)')
+    parser.add_argument('--test-size', type=float, default=0.2, help='Test fraction (default: 0.2)')
+    return parser.parse_args(argv)
+
+
+def main(argv=None):
+    args = parse_args(argv)
+
     try:
+        if args.epochs < 1:
+            raise ValueError('--epochs must be at least 1')
+        if args.batch_size < 1:
+            raise ValueError('--batch-size must be at least 1')
+        if not 0 < args.test_size < 1:
+            raise ValueError('--test-size must be between 0 and 1')
+
+        configure_reproducibility(args.seed)
+        print(f"Training configuration: seed={args.seed}, epochs={args.epochs}, "
+              f"batch_size={args.batch_size}, test_size={args.test_size}")
+
         # Load and preprocess data
         X_weather, X_temporal, y = load_and_preprocess_data(args.input)
-        
+
         # Train model
-        model, weather_scaler, temporal_scaler, metrics = train_model(X_weather, X_temporal, y)
-        
+        model, weather_scaler, temporal_scaler, metrics = train_model(
+            X_weather,
+            X_temporal,
+            y,
+            seed=args.seed,
+            epochs=args.epochs,
+            batch_size=args.batch_size,
+            test_size=args.test_size,
+        )
+        metrics['dataset_rows'] = int(len(y))
+        metrics['positive_labels'] = int(np.sum(y))
+        metrics['positive_label_rate'] = float(np.mean(y))
+
         # Save artifacts
-        save_model_and_artifacts(model, weather_scaler, temporal_scaler, metrics, args.output)
-        
+        save_model_and_artifacts(
+            model,
+            weather_scaler,
+            temporal_scaler,
+            metrics,
+            args.output,
+            args.input,
+            args.seed,
+        )
+
         print("Training completed successfully!")
-        
+
     except Exception as e:
         print(f"Training failed: {e}")
         sys.exit(1)

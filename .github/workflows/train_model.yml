@@ -7,10 +7,25 @@ on:
         description: 'Path to parquet file in repo'
         required: false
         default: 'storm_and_outage_merged_2014_2023.parquet'
+      seed:
+        description: 'Random seed'
+        required: false
+        default: '42'
+      epochs:
+        description: 'Training epochs'
+        required: false
+        default: '50'
   push:
     paths:
       - 'services/prediction/**'
       - 'storm_and_outage_merged_2014_2023.parquet'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: train-model-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   train:
@@ -24,17 +39,30 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: pip
+          cache-dependency-path: services/prediction/requirements.lock
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r services/prediction/requirements.txt
+          pip install -r services/prediction/requirements.lock
+
+      - name: Run preprocessing tests
+        run: python -m unittest discover -s services/prediction/tests -v
 
       - name: Train model
         run: |
           python services/prediction/train_from_parquet.py \
             --input "${{ github.event.inputs.parquet_path || 'storm_and_outage_merged_2014_2023.parquet' }}" \
-            --output ./models
+            --output ./models \
+            --seed "${{ github.event.inputs.seed || '42' }}" \
+            --epochs "${{ github.event.inputs.epochs || '50' }}"
+
+      - name: Upload training metrics
+        uses: actions/upload-artifact@v4
+        with:
+          name: training-metrics
+          path: models/metrics.json
 
       - name: Commit artifacts
         run: |
