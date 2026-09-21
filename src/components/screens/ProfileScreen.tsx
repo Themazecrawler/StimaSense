@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
   Alert,
   TextInput,
   KeyboardAvoidingView,
@@ -13,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '../../backend/supabase/SupabaseService';
 import { useTheme } from '../../contexts/ThemeContext';
+import { logger } from '../../observability/logger';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Avatar } from '../ui/Avatar';
@@ -54,20 +54,19 @@ export default function ProfileScreen() {
             .single();
 
           if (error && error.code !== 'PGRST116') {
-            console.error('Error loading profile:', error);
+            logger.error('profile.load_failed', error);
           } else {
             profileData = data;
           }
         } catch (dbError) {
-          console.error('Database error:', dbError);
-          // Continue with default profile
+          logger.error('profile.database_failed', dbError);
         }
 
         const userProfile: UserProfile = {
           id: user.id,
           email: user.email || '',
           full_name: profileData?.full_name || user.user_metadata?.full_name || 'User',
-          location: profileData?.location || 'Nairobi, Kenya',
+          location: profileData?.service_area || undefined,
           phone: profileData?.phone || '',
           created_at: user.created_at,
         };
@@ -75,31 +74,13 @@ export default function ProfileScreen() {
         setProfile(userProfile);
         setEditedProfile(userProfile);
       } else {
-        // Create a default profile if no user
-        const defaultProfile: UserProfile = {
-          id: 'default',
-          email: 'user@example.com',
-          full_name: 'Demo User',
-          location: 'Nairobi, Kenya',
-          phone: '',
-          created_at: new Date().toISOString(),
-        };
-        setProfile(defaultProfile);
-        setEditedProfile(defaultProfile);
+        setProfile(null);
+        setEditedProfile({});
       }
     } catch (error) {
-      console.error('Error loading profile:', error);
-      // Set fallback profile
-      const fallbackProfile: UserProfile = {
-        id: 'fallback',
-        email: 'user@example.com',
-        full_name: 'Demo User',
-        location: 'Nairobi, Kenya',
-        phone: '',
-        created_at: new Date().toISOString(),
-      };
-      setProfile(fallbackProfile);
-      setEditedProfile(fallbackProfile);
+      logger.error('profile.load_failed', error);
+      setProfile(null);
+      setEditedProfile({});
     } finally {
       setIsLoading(false);
     }
@@ -114,7 +95,7 @@ export default function ProfileScreen() {
         .upsert({
           id: profile.id,
           full_name: editedProfile.full_name,
-          location: editedProfile.location,
+          service_area: editedProfile.location,
           phone: editedProfile.phone,
           updated_at: new Date().toISOString(),
         });
@@ -127,7 +108,7 @@ export default function ProfileScreen() {
       setIsEditing(false);
       Alert.alert('Success', 'Profile updated successfully');
     } catch (error) {
-      console.error('Error updating profile:', error);
+      logger.error('profile.update_failed', error);
       Alert.alert('Error', 'Failed to update profile');
     }
   };
@@ -141,7 +122,7 @@ export default function ProfileScreen() {
     try {
       await supabase.auth.signOut();
     } catch (error) {
-      console.error('Error signing out:', error);
+      logger.error('auth.sign_out_failed', error);
     }
   };
 

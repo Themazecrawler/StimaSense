@@ -1,4 +1,11 @@
 name: Fetch KPLC Planned Outages
+permissions:
+  contents: write
+
+concurrency:
+  group: kplc-planned-outages
+  cancel-in-progress: false
+
 on:
   schedule:
     - cron: "0 */12 * * *"
@@ -13,14 +20,16 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install deps
-        run: pip install -r services/prediction/requirements.txt
+        run: pip install -r services/kplc/scraper/requirements.txt
+      - name: Test parser validation
+        run: python -m unittest discover -s services/kplc/scraper/tests -v
       - name: Fetch KPLC outages
-        run: python services/kplc/scraper/fetch_kplc_planned_outages.py models/planned_outages.json
+        run: python services/kplc/scraper/fetch_kplc_planned_outages.py models/planned_outages.json --mirror src/models/planned_outages.json
       - name: Commit updates
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add models/planned_outages.json
+          git add models/planned_outages.json src/models/planned_outages.json
           git commit -m "Update planned outages [skip ci]" || echo "No changes"
           git push
 
