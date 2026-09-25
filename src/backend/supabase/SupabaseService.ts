@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { environment } from '../../config/environment';
 import { logger } from '../../observability/logger';
+import { OutageReportInputSchema, UserProfileUpdateSchema, parseOrThrow } from './schemas';
 
 // Supabase configuration
 const supabaseUrl = environment.optionalSupabaseUrl || 'https://unconfigured.invalid';
@@ -133,13 +134,15 @@ export class SupabaseService {
   }
 
   async updateUserProfile(updates: Partial<User>): Promise<User | null> {
+    const validUpdates = parseOrThrow(UserProfileUpdateSchema, 'profile update', updates);
+
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No authenticated user');
 
       const { data, error } = await supabase
         .from('profiles')
-        .update(updates)
+        .update(validUpdates)
         .eq('id', user.id)
         .select()
         .single();
@@ -154,10 +157,12 @@ export class SupabaseService {
 
   // Outage reports
   async createOutageReport(report: Omit<OutageReport, 'id' | 'created_at' | 'updated_at'>): Promise<OutageReport | null> {
+    const validReport = parseOrThrow(OutageReportInputSchema, 'outage report', report);
+
     try {
       const { data, error } = await supabase
         .from('outage_reports')
-        .insert([report])
+        .insert([validReport])
         .select()
         .single();
 
