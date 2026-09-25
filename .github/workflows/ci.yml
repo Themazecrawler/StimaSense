@@ -85,6 +85,19 @@ jobs:
       - name: Install test dependencies
         run: pip install -r services/prediction/test-requirements.txt
 
+      - name: Lint Python
+        run: |
+          pip install ruff
+          ruff check services
+
+      - name: Audit Python dependencies (advisory)
+        # keras and protobuf findings are pinned by tensorflow 2.15, which
+        # tensorflowjs conversion requires; tracked until that pin can move.
+        continue-on-error: true
+        run: |
+          pip install pip-audit
+          pip-audit -r services/prediction/requirements.lock --no-deps --disable-pip
+
       - name: Run ML unit tests
         run: python -m unittest discover -s services/prediction/tests -v
 
