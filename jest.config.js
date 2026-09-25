@@ -12,10 +12,10 @@ module.exports = {
   ],
   coverageThreshold: {
     global: {
-      branches: 10,
-      functions: 15,
-      lines: 15,
-      statements: 15,
+      branches: 45,
+      functions: 55,
+      lines: 58,
+      statements: 55,
     },
     'services/ml/AutoPredictionService.ts': {
       functions: 80,
