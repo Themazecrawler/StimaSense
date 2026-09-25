@@ -9,13 +9,12 @@ import hashlib
 import io
 import json
 import os
-from pathlib import Path
 import re
 import sys
 import urllib.parse
 import urllib.request
+from pathlib import Path
 from typing import Dict, List
-
 
 DEFAULT_SOURCE_URL = os.environ.get(
     "KPLC_SOURCE_URL",

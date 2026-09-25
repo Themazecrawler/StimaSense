@@ -1,0 +1,6 @@
+line-length = 120
+target-version = "py311"
+extend-exclude = ["node_modules", "android", "ios", "models"]
+
+[lint]
+select = ["E", "F", "W", "I", "B"]

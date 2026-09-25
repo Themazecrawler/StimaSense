@@ -1,8 +1,7 @@
 import datetime as dt
 import importlib.util
-from pathlib import Path
 import unittest
-
+from pathlib import Path
 
 SCRIPT = Path(__file__).parents[1] / "fetch_kplc_planned_outages.py"
 SPEC = importlib.util.spec_from_file_location("kplc_scraper", SCRIPT)
