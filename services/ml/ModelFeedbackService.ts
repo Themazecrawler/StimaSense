@@ -1,59 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { logger } from '../../src/observability/logger';
+import { computeFeedbackAnalytics } from './feedbackAnalytics';
+import type { FeedbackAnalytics, FeedbackData } from './feedbackTypes';
 
-export interface FeedbackData {
-  predictionId: string;
-  userId?: string;
-  timestamp: Date;
-  
-  // User feedback on prediction accuracy
-  predictionFeedback: {
-    wasAccurate: boolean;
-    accuracyRating: number; // 1-5 scale
-    confidenceInFeedback: number; // 1-5 scale
-    timeToFeedback: number; // minutes after prediction
-  };
-  
-  // Actual outcome data
-  actualOutcome: {
-    hadOutage: boolean;
-    outageDetails?: {
-      startTime: Date;
-      endTime?: Date;
-      duration: number; // minutes
-      cause: 'weather' | 'equipment' | 'overload' | 'maintenance' | 'unknown';
-      severity: 'low' | 'medium' | 'high' | 'critical';
-      affectedArea: string;
-      estimatedCustomersAffected: number;
-    };
-    verificationSource: 'user_report' | 'utility_api' | 'news_report' | 'social_media' | 'app_users';
-    verificationConfidence: number; // 0-1
-  };
-  
-  // Additional context
-  context: {
-    userLocation: { latitude: number; longitude: number };
-    reportMethod: 'manual' | 'automatic' | 'scheduled_check';
-    hasPhotos: boolean;
-    hasAdditionalReports: boolean; // Other users reporting same outage
-    weatherConditionsAtTime: any;
-  };
-}
-
-export interface FeedbackAnalytics {
-  totalFeedbackCount: number;
-  averageAccuracyRating: number;
-  predictionAccuracyRate: number;
-  falsePositiveRate: number;
-  falseNegativeRate: number;
-  avgTimeToFeedback: number; // minutes
-  feedbackQualityScore: number; // 0-1
-  userEngagementScore: number; // 0-1
-  recentTrends: {
-    accuracyTrend: 'improving' | 'stable' | 'declining';
-    feedbackVolumeTrend: 'increasing' | 'stable' | 'decreasing';
-  };
-}
+export type { FeedbackAnalytics, FeedbackData } from './feedbackTypes';
 
 class ModelFeedbackService {
   private feedbackData: FeedbackData[] = [];
@@ -198,67 +148,7 @@ class ModelFeedbackService {
         )
       : this.feedbackData;
 
-    if (filteredFeedback.length === 0) {
-      return this.getDefaultAnalytics();
-    }
-
-    // Calculate basic metrics
-    const totalCount = filteredFeedback.length;
-    const accuratePredictions = filteredFeedback.filter(f => f.predictionFeedback.wasAccurate).length;
-    const averageRating = filteredFeedback.reduce((sum, f) => sum + f.predictionFeedback.accuracyRating, 0) / totalCount;
-    const accuracyRate = accuratePredictions / totalCount;
-
-    // Calculate false positive/negative rates
-    const truePositives = filteredFeedback.filter(f => 
-      f.actualOutcome.hadOutage && f.predictionFeedback.wasAccurate
-    ).length;
-    const falsePositives = filteredFeedback.filter(f => 
-      !f.actualOutcome.hadOutage && !f.predictionFeedback.wasAccurate
-    ).length;
-    const falseNegatives = filteredFeedback.filter(f => 
-      f.actualOutcome.hadOutage && !f.predictionFeedback.wasAccurate
-    ).length;
-
-    const totalPredictedOutages = truePositives + falsePositives;
-    const totalActualOutages = truePositives + falseNegatives;
-
-    const falsePositiveRate = totalPredictedOutages > 0 ? falsePositives / totalPredictedOutages : 0;
-    const falseNegativeRate = totalActualOutages > 0 ? falseNegatives / totalActualOutages : 0;
-
-    // Average time to feedback
-    const avgTimeToFeedback = filteredFeedback.reduce(
-      (sum, f) => sum + f.predictionFeedback.timeToFeedback, 0
-    ) / totalCount;
-
-    // Feedback quality score
-    const avgConfidence = filteredFeedback.reduce(
-      (sum, f) => sum + f.predictionFeedback.confidenceInFeedback, 0
-    ) / totalCount;
-    const verifiedFeedback = filteredFeedback.filter(f => 
-      f.actualOutcome.verificationConfidence > 0.7
-    ).length;
-    const feedbackQualityScore = (avgConfidence / 5 * 0.5) + (verifiedFeedback / totalCount * 0.5);
-
-    // User engagement score
-    const recentFeedback = filteredFeedback.filter(f => 
-      Date.now() - new Date(f.timestamp).getTime() < 7 * 24 * 60 * 60 * 1000 // Last 7 days
-    ).length;
-    const userEngagementScore = Math.min(recentFeedback / 10, 1); // Target: 10+ feedback per week
-
-    // Calculate trends
-    const trends = this.calculateTrends(filteredFeedback);
-
-    return {
-      totalFeedbackCount: totalCount,
-      averageAccuracyRating: averageRating,
-      predictionAccuracyRate: accuracyRate,
-      falsePositiveRate,
-      falseNegativeRate,
-      avgTimeToFeedback,
-      feedbackQualityScore,
-      userEngagementScore,
-      recentTrends: trends,
-    };
+    return computeFeedbackAnalytics(filteredFeedback);
   }
 
   /**
@@ -438,59 +328,6 @@ class ModelFeedbackService {
     }
   }
 
-  private calculateTrends(feedbackData: FeedbackData[]): {
-    accuracyTrend: 'improving' | 'stable' | 'declining';
-    feedbackVolumeTrend: 'increasing' | 'stable' | 'decreasing';
-  } {
-    // Simple trend calculation - compare recent vs older data
-    const midpoint = Math.floor(feedbackData.length / 2);
-    
-    if (feedbackData.length < 20) {
-      return { accuracyTrend: 'stable', feedbackVolumeTrend: 'stable' };
-    }
-    
-    const olderData = feedbackData.slice(0, midpoint);
-    const recentData = feedbackData.slice(midpoint);
-    
-    const olderAccuracy = olderData.filter(f => f.predictionFeedback.wasAccurate).length / olderData.length;
-    const recentAccuracy = recentData.filter(f => f.predictionFeedback.wasAccurate).length / recentData.length;
-    
-    const accuracyTrend = 
-      recentAccuracy > olderAccuracy + 0.05 ? 'improving' :
-      recentAccuracy < olderAccuracy - 0.05 ? 'declining' : 'stable';
-    
-    // For volume trend, compare recent week to previous week
-    const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const twoWeeksAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
-    
-    const recentWeekCount = feedbackData.filter(f => new Date(f.timestamp) > oneWeekAgo).length;
-    const previousWeekCount = feedbackData.filter(f => 
-      new Date(f.timestamp) > twoWeeksAgo && new Date(f.timestamp) <= oneWeekAgo
-    ).length;
-    
-    const feedbackVolumeTrend = 
-      recentWeekCount > previousWeekCount * 1.2 ? 'increasing' :
-      recentWeekCount < previousWeekCount * 0.8 ? 'decreasing' : 'stable';
-    
-    return { accuracyTrend, feedbackVolumeTrend };
-  }
-
-  private getDefaultAnalytics(): FeedbackAnalytics {
-    return {
-      totalFeedbackCount: 0,
-      averageAccuracyRating: 0,
-      predictionAccuracyRate: 0,
-      falsePositiveRate: 0,
-      falseNegativeRate: 0,
-      avgTimeToFeedback: 0,
-      feedbackQualityScore: 0,
-      userEngagementScore: 0,
-      recentTrends: {
-        accuracyTrend: 'stable',
-        feedbackVolumeTrend: 'stable',
-      },
-    };
-  }
 
   private async loadStoredFeedback(): Promise<void> {
     try {
