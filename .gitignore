@@ -79,3 +79,4 @@ __pycache__/
 !.yarn/sdks
 !.yarn/versions
 mlruns/
+*.code-workspace
