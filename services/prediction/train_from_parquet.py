@@ -308,6 +308,24 @@ def save_model_and_artifacts(
     print(f"- Model metadata: {os.path.join(output_dir, 'model_metadata.json')}")
     print(f"- Metrics: {os.path.join(output_dir, 'metrics.json')}")
 
+def log_mlflow_run(args, metrics, tracking_dir):
+    """Record params, metrics and artifacts in a local MLflow file store."""
+    import mlflow  # imported lazily so training and unit tests do not require it
+
+    mlflow.set_tracking_uri(f'file:{os.path.abspath(tracking_dir)}')
+    mlflow.set_experiment('outage-prediction')
+    with mlflow.start_run():
+        mlflow.log_params({
+            'seed': args.seed,
+            'epochs': args.epochs,
+            'batch_size': args.batch_size,
+            'test_size': args.test_size,
+            'input_sha256': sha256_file(args.input),
+        })
+        mlflow.log_metrics({k: v for k, v in metrics.items() if isinstance(v, (int, float))})
+        mlflow.log_artifacts(args.output)
+
+
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(description='Train outage prediction model')
     parser.add_argument('--input', required=True, help='Path to input parquet file')
@@ -316,6 +334,8 @@ def parse_args(argv=None):
     parser.add_argument('--epochs', type=int, default=50, help='Training epochs (default: 50)')
     parser.add_argument('--batch-size', type=int, default=32, help='Training batch size (default: 32)')
     parser.add_argument('--test-size', type=float, default=0.2, help='Test fraction (default: 0.2)')
+    parser.add_argument('--track', action='store_true', help='Log the run to a local MLflow store')
+    parser.add_argument('--tracking-dir', default='mlruns', help='MLflow store directory (default: mlruns)')
     return parser.parse_args(argv)
 
 
@@ -361,6 +381,9 @@ def main(argv=None):
             args.input,
             args.seed,
         )
+
+        if args.track:
+            log_mlflow_run(args, metrics, args.tracking_dir)
 
         print("Training completed successfully!")
 

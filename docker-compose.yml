@@ -1,0 +1,19 @@
+# Reproducible model training with MLflow run tracking.
+#   docker compose run --rm train
+# Model artifacts land in ./models, tracked runs in ./mlruns.
+services:
+  train:
+    build: .
+    command:
+      - --input
+      - storm_and_outage_merged_2014_2023.parquet
+      - --output
+      - /out
+      - --seed
+      - "42"
+      - --track
+      - --tracking-dir
+      - /mlruns
+    volumes:
+      - ./models:/out
+      - ./mlruns:/mlruns
