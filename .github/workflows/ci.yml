@@ -43,6 +43,29 @@ jobs:
       - name: Audit production and development dependencies
         run: npm run audit
 
+  commit-messages:
+    name: Conventional commit messages
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check commit subjects
+        run: |
+          pattern='^(feat|fix|docs|refactor|test|build|ci|perf|chore|style|revert)(\([^)]+\))?!?: .+'
+          status=0
+          for subject in $(git log --format=%H ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}); do
+            msg=$(git log -1 --format=%s "$subject")
+            case "$msg" in Merge*) continue ;; esac
+            if ! echo "$msg" | grep -Eq "$pattern"; then echo "Not conventional: $msg"; status=1; fi
+          done
+          exit $status
+
   ml-unit-tests:
     name: ML preprocessing tests
     runs-on: ubuntu-latest
