@@ -1,0 +1,58 @@
+{
+  "model_version": "1.0.0",
+  "created_at": "2026-09-25T23:58:02.097428+00:00",
+  "framework": "TensorFlow.js",
+  "performance": {
+    "accuracy": 0.9968797218775721,
+    "precision": 0.9968797218775721,
+    "recall": 1.0,
+    "f1_score": 0.9984374231015306,
+    "loss": 0.0205447468906641,
+    "baseline": {
+      "accuracy": 0.997297396901834,
+      "precision": 0.9988288810266399,
+      "recall": 0.9984596236552514,
+      "f1_score": 0.998644218206917
+    },
+    "epochs": 50,
+    "batch_size": 32,
+    "test_size": 0.2,
+    "final_training_loss": 0.04991333186626434,
+    "final_validation_loss": 0.020739030092954636,
+    "dataset_rows": 407011,
+    "positive_labels": 405740,
+    "positive_label_rate": 0.9968772342762235,
+    "seed": 42,
+    "input_file": "storm_and_outage_merged_2014_2023.parquet",
+    "input_sha256": "19a44d01fdff72d3612946baffd0384b61f02e11261804a68c667e92e442d487"
+  },
+  "input_features": {
+    "weather_features": [
+      "MAGNITUDE_IMPUTED",
+      "duration_hours",
+      "DAMAGE_PROPERTY",
+      "INJURIES_DIRECT",
+      "DAMAGE_CROPS"
+    ],
+    "temporal_features": [
+      "hour",
+      "day_of_week",
+      "month",
+      "is_weekend"
+    ]
+  },
+  "preprocessing": {
+    "weather_scaling": "RobustScaler",
+    "temporal_scaling": "MinMaxScaler"
+  },
+  "data_source": "storm_and_outage_merged_2014_2023.parquet",
+  "data_sha256": "19a44d01fdff72d3612946baffd0384b61f02e11261804a68c667e92e442d487",
+  "seed": 42,
+  "feature_mapping": {
+    "MAGNITUDE_IMPUTED": "Storm magnitude (wind speed proxy)",
+    "duration_hours": "Storm duration (weather persistence proxy)",
+    "DAMAGE_PROPERTY": "Property damage (weather severity proxy)",
+    "INJURIES_DIRECT": "Direct injuries (storm impact proxy)",
+    "DAMAGE_CROPS": "Crop damage (weather severity proxy)"
+  }
+}
