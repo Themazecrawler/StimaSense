@@ -14,6 +14,9 @@ from datetime import datetime, timezone
 import numpy as np
 import pandas as pd
 
+# tensorflowjs converts Keras 2 models; keep tf.keras on tf_keras under TensorFlow >= 2.16.
+os.environ.setdefault('TF_USE_LEGACY_KERAS', '1')
+
 WEATHER_FEATURES = [
     'MAGNITUDE_IMPUTED',
     'duration_hours',
@@ -121,7 +124,11 @@ def create_model(weather_input_dim, temporal_input_dim):
     model.compile(
         optimizer='adam',
         loss='binary_crossentropy',
-        metrics=['accuracy', 'precision', 'recall']
+        metrics=[
+            'accuracy',
+            keras.metrics.Precision(name='precision'),
+            keras.metrics.Recall(name='recall'),
+        ],
     )
 
     return model

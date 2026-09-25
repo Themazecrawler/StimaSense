@@ -91,8 +91,8 @@ jobs:
           ruff check services
 
       - name: Audit Python dependencies (advisory)
-        # keras and protobuf findings are pinned by tensorflow 2.15, which
-        # tensorflowjs conversion requires; tracked until that pin can move.
+        # The remaining wheel finding is capped by a pinned transitive dependency
+        # of tensorflowjs; advisory until that cap moves.
         continue-on-error: true
         run: |
           pip install pip-audit
