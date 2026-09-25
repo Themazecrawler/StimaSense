@@ -16,7 +16,7 @@ import { logger } from '../../observability/logger';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Avatar } from '../ui/Avatar';
-import { Separator } from '../ui/Separator';
+import { Separator } from '../ui/separator';
 import { Switch } from '../ui/Switch';
 
 interface UserProfile {
