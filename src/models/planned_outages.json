@@ -1,47 +1,11 @@
 [
   {
-    "id": "1c85f33abadac02402b2",
-    "region": "SOUTH NYANZA REGION",
-    "area": "MABERA, ISIBANIA",
-    "startTime": "2026-10-02T05:30:00Z",
-    "endTime": "2026-10-02T14:00:00Z",
-    "sourceUrl": "https://www.kplc.co.ke/storage/01M3C1MX9XJ89G6Z4EDV615XQ2.pdf",
-    "createdAt": "2026-10-02T02:37:56Z"
-  },
-  {
-    "id": "bf7be0367026243e717d",
-    "region": "NAIROBI REGION",
-    "area": "PART OF JAMES GICHURU",
-    "startTime": "2026-10-02T06:00:00Z",
-    "endTime": "2026-10-02T14:00:00Z",
-    "sourceUrl": "https://www.kplc.co.ke/storage/01M3C1MX9XJ89G6Z4EDV615XQ2.pdf",
-    "createdAt": "2026-10-02T02:37:56Z"
-  },
-  {
-    "id": "95e774802f716218ef20",
-    "region": "NAIROBI REGION",
-    "area": "MANYANI WEST, WAIYAKI WAY",
-    "startTime": "2026-10-02T06:00:00Z",
-    "endTime": "2026-10-02T14:00:00Z",
-    "sourceUrl": "https://www.kplc.co.ke/storage/01M3C1MX9XJ89G6Z4EDV615XQ2.pdf",
-    "createdAt": "2026-10-02T02:37:56Z"
-  },
-  {
-    "id": "7ff68f900768aabb69ba",
-    "region": "NAIROBI REGION",
-    "area": "MADARAKA, NGUUMO",
-    "startTime": "2026-10-02T06:00:00Z",
-    "endTime": "2026-10-02T14:00:00Z",
-    "sourceUrl": "https://www.kplc.co.ke/storage/01M3C1MX9XJ89G6Z4EDV615XQ2.pdf",
-    "createdAt": "2026-10-02T02:37:56Z"
-  },
-  {
     "id": "b515b4dff9c92a54eb67",
     "region": "WESTERN REGION",
     "area": "BUSALI",
     "startTime": "2026-10-04T06:00:00Z",
     "endTime": "2026-10-04T14:00:00Z",
     "sourceUrl": "https://www.kplc.co.ke/storage/01M3C1MX9XJ89G6Z4EDV615XQ2.pdf",
-    "createdAt": "2026-10-02T02:37:56Z"
+    "createdAt": "2026-10-02T16:51:28Z"
   }
 ]
