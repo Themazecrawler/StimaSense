@@ -6,7 +6,7 @@
     "startTime": "2026-10-16T05:00:00Z",
     "endTime": "2026-10-16T14:00:00Z",
     "sourceUrl": "https://www.kplc.co.ke/storage/01M4B0P49VS4V5396C66BPHZQA.pdf",
-    "createdAt": "2026-10-16T01:45:38Z"
+    "createdAt": "2026-10-16T15:36:44Z"
   },
   {
     "id": "f68717f0a27022b7ed13",
@@ -15,6 +15,537 @@
     "startTime": "2026-10-16T06:00:00Z",
     "endTime": "2026-10-16T14:00:00Z",
     "sourceUrl": "https://www.kplc.co.ke/storage/01M4B0P49VS4V5396C66BPHZQA.pdf",
-    "createdAt": "2026-10-16T01:45:38Z"
+    "createdAt": "2026-10-16T15:36:44Z"
+  },
+  {
+    "id": "22d7370aef838a5cda6e",
+    "region": "NAIROBI REGION",
+    "area": "WHOLE OF JOSKA, RUAI, NORTH IMPACT",
+    "startTime": "2026-10-18T04:00:00Z",
+    "endTime": "2026-10-18T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "c7e1b843147bdecb79ca",
+    "region": "NAIROBI REGION",
+    "area": "PART OF PARKLANDS",
+    "startTime": "2026-10-18T06:00:00Z",
+    "endTime": "2026-10-18T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "552c02e2e76e4f2d6798",
+    "region": "NAIROBI REGION",
+    "area": "PARTS OF KOMAROCK",
+    "startTime": "2026-10-18T06:00:00Z",
+    "endTime": "2026-10-18T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "c9dad84501aeebbec507",
+    "region": "NAIROBI REGION",
+    "area": "KANGUNDO ROAD FROM JOSKA TO NGULUNI",
+    "startTime": "2026-10-18T06:00:00Z",
+    "endTime": "2026-10-18T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "a6780ee2bdc95aea18c2",
+    "region": "NAIROBI REGION",
+    "area": "TALA",
+    "startTime": "2026-10-18T06:00:00Z",
+    "endTime": "2026-10-18T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "21546c6f9e86eb66bb7c",
+    "region": "NAIROBI REGION",
+    "area": "KANGUNDO",
+    "startTime": "2026-10-18T06:00:00Z",
+    "endTime": "2026-10-18T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "d297b9d266296956881a",
+    "region": "NORTH EASTERN REGION",
+    "area": "JUJA TOWN, KENYATTA ROAD",
+    "startTime": "2026-10-18T06:00:00Z",
+    "endTime": "2026-10-18T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "7aad6f1643dd360c52cc",
+    "region": "COAST REGION",
+    "area": "PARTS OF KANAMAI, MTWAPA, PARTS OF KILIFI",
+    "startTime": "2026-10-18T06:00:00Z",
+    "endTime": "2026-10-18T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "48bebab585f2f8f25df4",
+    "region": "WESTERN REGION",
+    "area": "LUBAO MARKET",
+    "startTime": "2026-10-18T07:00:00Z",
+    "endTime": "2026-10-18T11:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "3b90f8758b5c0520b0b6",
+    "region": "NAIROBI REGION",
+    "area": "PART OF KITSURU",
+    "startTime": "2026-10-19T06:00:00Z",
+    "endTime": "2026-10-19T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "07f4a07f684be01230c1",
+    "region": "CENTRAL RIFT REGION",
+    "area": "LONGISA, MULOT, KEMBU, TEGAT",
+    "startTime": "2026-10-19T06:00:00Z",
+    "endTime": "2026-10-19T13:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "60a8f13c3bbcd2295db3",
+    "region": "NORTH RIFT REGION",
+    "area": "KABONGWA, CHEBARBAR",
+    "startTime": "2026-10-19T06:00:00Z",
+    "endTime": "2026-10-19T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "0c2a6edd11bc9eeaaffe",
+    "region": "WESTERN REGION",
+    "area": "HUMA GIRLS, MARERA",
+    "startTime": "2026-10-19T06:00:00Z",
+    "endTime": "2026-10-19T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "23732839cf7ec4a48421",
+    "region": "WESTERN REGION",
+    "area": "NGOORU, KIHINGO, GITHIMA",
+    "startTime": "2026-10-19T06:00:00Z",
+    "endTime": "2026-10-19T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "166f646c86e8f872f537",
+    "region": "WESTERN REGION",
+    "area": "KINYAITI PRIMARY, SIKAI SANA, KINYAITI",
+    "startTime": "2026-10-19T06:00:00Z",
+    "endTime": "2026-10-19T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "6024605776554cd1b7e8",
+    "region": "SOUTH NYANZA REGION",
+    "area": "WATH ONG’ER, NYAKWERI",
+    "startTime": "2026-10-19T06:00:00Z",
+    "endTime": "2026-10-19T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "c54aea4d0465108cc94d",
+    "region": "MT. KENYA REGION",
+    "area": "NYERI POLYTECHNIC, KANOGA, KANDARA",
+    "startTime": "2026-10-19T06:00:00Z",
+    "endTime": "2026-10-19T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "7b1108cb3316bcdb629f",
+    "region": "WESTERN REGION",
+    "area": "WEBUYE TOWN",
+    "startTime": "2026-10-20T05:00:00Z",
+    "endTime": "2026-10-20T13:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "d68c447cc28452517c56",
+    "region": "WESTERN REGION",
+    "area": "MUNYIKANA, UNITED MILLERS",
+    "startTime": "2026-10-20T05:00:00Z",
+    "endTime": "2026-10-20T13:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "f036a49b9a638c48de4b",
+    "region": "SOUTH NYANZA REGION",
+    "area": "LWANDA MAGWAR, NYASOKO",
+    "startTime": "2026-10-20T06:00:00Z",
+    "endTime": "2026-10-20T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "f558c7e18e83e91fe33f",
+    "region": "NORTH EASTERN REGION",
+    "area": "TINGANGA MARKET, SASINI",
+    "startTime": "2026-10-20T06:00:00Z",
+    "endTime": "2026-10-20T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "006ce0376d28f5684378",
+    "region": "NORTH EASTERN REGION",
+    "area": "KIKUYU TOWN",
+    "startTime": "2026-10-20T06:00:00Z",
+    "endTime": "2026-10-20T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "a1724d507280157e8dee",
+    "region": "NAIROBI REGION",
+    "area": "HIGHRISE, NGUMO",
+    "startTime": "2026-10-21T06:00:00Z",
+    "endTime": "2026-10-21T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "51e9d0c6c52f5a6e0f19",
+    "region": "NORTH RIFT REGION",
+    "area": "NDULELE, CHEMNOET",
+    "startTime": "2026-10-21T06:00:00Z",
+    "endTime": "2026-10-21T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "e04e9ea85825759d25af",
+    "region": "WESTERN REGION",
+    "area": "KHWISERO MARKET",
+    "startTime": "2026-10-21T06:00:00Z",
+    "endTime": "2026-10-21T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "370b352137f38ca2fea0",
+    "region": "WESTERN REGION",
+    "area": "MURUGURU, KIHETHU",
+    "startTime": "2026-10-21T06:00:00Z",
+    "endTime": "2026-10-21T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "a77b4d24e2ba8bd700bf",
+    "region": "WESTERN REGION",
+    "area": "ITIATI, KIAMUCHERU",
+    "startTime": "2026-10-21T06:00:00Z",
+    "endTime": "2026-10-21T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "2aea60b43de28d39dc80",
+    "region": "WESTERN REGION",
+    "area": "LUFWINDIRE",
+    "startTime": "2026-10-21T06:00:00Z",
+    "endTime": "2026-10-21T10:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "e490521da4f79b7e147e",
+    "region": "WESTERN REGION",
+    "area": "EREGI",
+    "startTime": "2026-10-21T06:00:00Z",
+    "endTime": "2026-10-21T10:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "dcca074393c451e92e89",
+    "region": "SOUTH NYANZA REGION",
+    "area": "NDIWA, NYATUORO",
+    "startTime": "2026-10-21T06:00:00Z",
+    "endTime": "2026-10-21T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "94baca447839767f5460",
+    "region": "NORTH EASTERN REGION",
+    "area": "SUMEYA, 17KR MODIKA, MAUA MILLERS",
+    "startTime": "2026-10-21T06:00:00Z",
+    "endTime": "2026-10-21T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "1d3106626403531ac4e4",
+    "region": "NORTH EASTERN REGION",
+    "area": "KAWUONGO MARKET, KWA KILUI MARKET",
+    "startTime": "2026-10-21T06:00:00Z",
+    "endTime": "2026-10-21T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "f6a73cf57aa18b63f2b0",
+    "region": "COAST REGION",
+    "area": "PARTS MARIAKANI",
+    "startTime": "2026-10-21T06:00:00Z",
+    "endTime": "2026-10-21T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "6d33827cd2f9cb481a07",
+    "region": "COAST REGION",
+    "area": "KWALE TOWN, KINANGO, TIRIBE",
+    "startTime": "2026-10-21T06:00:00Z",
+    "endTime": "2026-10-21T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "ce362bba52f95f085c63",
+    "region": "COAST REGION",
+    "area": "MANDA, LAMU LAPSET PORT",
+    "startTime": "2026-10-21T06:00:00Z",
+    "endTime": "2026-10-21T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "14813bcf888ebce5539e",
+    "region": "NAIROBI REGION",
+    "area": "EMBAKASI",
+    "startTime": "2026-10-22T05:00:00Z",
+    "endTime": "2026-10-22T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "0e52e8d1253b9c4679df",
+    "region": "MT. KENYA REGION",
+    "area": "NTUGI, KISIMA, MARANIA, EMBORI",
+    "startTime": "2026-10-22T05:00:00Z",
+    "endTime": "2026-10-22T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "32107891a80a31193c1a",
+    "region": "NAIROBI REGION",
+    "area": "PART OF MIREMA",
+    "startTime": "2026-10-22T06:00:00Z",
+    "endTime": "2026-10-22T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "41dc5ee24369751a7171",
+    "region": "NAIROBI REGION",
+    "area": "PART OF SPRING VALLEY",
+    "startTime": "2026-10-22T06:00:00Z",
+    "endTime": "2026-10-22T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "ea060d7ca426220cf8f9",
+    "region": "NAIROBI REGION",
+    "area": "KASUKU, JABAVU",
+    "startTime": "2026-10-22T06:00:00Z",
+    "endTime": "2026-10-22T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "d138115aa2cb7cbca8c0",
+    "region": "NORTH RIFT REGION",
+    "area": "KIPYESH, CHEMUK",
+    "startTime": "2026-10-22T06:00:00Z",
+    "endTime": "2026-10-22T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "d8106349b1861fca7925",
+    "region": "WESTERN REGION",
+    "area": "SOS",
+    "startTime": "2026-10-22T06:00:00Z",
+    "endTime": "2026-10-22T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "2fd81628791496c1ddb5",
+    "region": "SOUTH NYANZA REGION",
+    "area": "WANG’ELONG’O, KABUTO",
+    "startTime": "2026-10-22T06:00:00Z",
+    "endTime": "2026-10-22T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "d5ffcd7a659c5fea1f63",
+    "region": "MT. KENYA REGION",
+    "area": "RURING'U STADIUM, KIAMWATHI, GIAKANJA",
+    "startTime": "2026-10-22T06:00:00Z",
+    "endTime": "2026-10-22T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "9259a646ac0dbb9609f9",
+    "region": "MT. KENYA REGION",
+    "area": "KIGANJO POLICE COLLEGE, KAGUMO, KIRICHU",
+    "startTime": "2026-10-22T06:00:00Z",
+    "endTime": "2026-10-22T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "39ead30a6b917a43877e",
+    "region": "MT. KENYA REGION",
+    "area": "KIUU MARKET, UJAMAA",
+    "startTime": "2026-10-22T06:00:00Z",
+    "endTime": "2026-10-22T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "3c080e35367e69e45811",
+    "region": "NORTH EASTERN REGION",
+    "area": "PLATINUM ESTATE, PART OF BANANA",
+    "startTime": "2026-10-22T06:00:00Z",
+    "endTime": "2026-10-22T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "7ed5f5577a084367a77b",
+    "region": "NORTH EASTERN REGION",
+    "area": "KWA VONZA SECONDARY",
+    "startTime": "2026-10-22T06:00:00Z",
+    "endTime": "2026-10-22T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "fac65ec1896071d252e6",
+    "region": "COAST REGION",
+    "area": "WHOLE OF NYALI",
+    "startTime": "2026-10-22T06:00:00Z",
+    "endTime": "2026-10-22T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "9839bfaa0dad1f3a886d",
+    "region": "COAST REGION",
+    "area": "MVINDENI, ZIGIRA, UKUNDA POSTA",
+    "startTime": "2026-10-22T06:00:00Z",
+    "endTime": "2026-10-22T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "dbd98f733a4a4fcc179f",
+    "region": "WESTERN REGION",
+    "area": "MUSANDA MARKET",
+    "startTime": "2026-10-23T05:30:00Z",
+    "endTime": "2026-10-23T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "a7019067bb5b107da349",
+    "region": "NAIROBI REGION",
+    "area": "PART OF PANGANI",
+    "startTime": "2026-10-23T06:00:00Z",
+    "endTime": "2026-10-23T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "0c65aabea8ba0abdf91e",
+    "region": "NAIROBI REGION",
+    "area": "GITHURAI",
+    "startTime": "2026-10-23T06:00:00Z",
+    "endTime": "2026-10-23T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "c723a656564a17eab612",
+    "region": "NORTH RIFT REGION",
+    "area": "KOISOLIK, KIMONG",
+    "startTime": "2026-10-23T06:00:00Z",
+    "endTime": "2026-10-23T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "1905c877fc0840119ad4",
+    "region": "SOUTH NYANZA REGION",
+    "area": "OBWARE, OJAWA",
+    "startTime": "2026-10-23T06:00:00Z",
+    "endTime": "2026-10-23T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "3ccc66c6447f996b63ce",
+    "region": "MT. KENYA REGION",
+    "area": "GACHATHA, KARIGUINI",
+    "startTime": "2026-10-23T06:00:00Z",
+    "endTime": "2026-10-23T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "bf70e32016b0d4ddb500",
+    "region": "MT. KENYA REGION",
+    "area": "ENDARASHA, CHARITY, WATUKA",
+    "startTime": "2026-10-23T06:00:00Z",
+    "endTime": "2026-10-23T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "c59bde6a37f3bef60194",
+    "region": "NORTH RIFT REGION",
+    "area": "KIPKAREN, SELIA",
+    "startTime": "2026-10-24T06:00:00Z",
+    "endTime": "2026-10-24T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
+  },
+  {
+    "id": "8aba15da9af850813660",
+    "region": "MT. KENYA REGION",
+    "area": "KANUNA VILLAGE",
+    "startTime": "2026-10-24T06:00:00Z",
+    "endTime": "2026-10-24T14:00:00Z",
+    "sourceUrl": "https://www.kplc.co.ke/storage/01M52071CF60Y1VKK6JSR9TNDK.pdf",
+    "createdAt": "2026-10-16T15:36:43Z"
   }
 ]
