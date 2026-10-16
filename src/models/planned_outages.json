@@ -1,93 +1,12 @@
 [
   {
-    "id": "24948fe583c560db8b6b",
-    "region": "NAIROBI REGION",
-    "area": "TASSIA",
-    "startTime": "2026-10-15T05:00:00Z",
-    "endTime": "2026-10-15T14:00:00Z",
-    "sourceUrl": "https://www.kplc.co.ke/storage/01M4B0P49VS4V5396C66BPHZQA.pdf",
-    "createdAt": "2026-10-15T15:48:23Z"
-  },
-  {
-    "id": "f7cd1c191494d9ca0635",
-    "region": "NAIROBI REGION",
-    "area": "OLOOLUA, KAJIADO",
-    "startTime": "2026-10-15T05:00:00Z",
-    "endTime": "2026-10-15T14:00:00Z",
-    "sourceUrl": "https://www.kplc.co.ke/storage/01M4B0P49VS4V5396C66BPHZQA.pdf",
-    "createdAt": "2026-10-15T15:48:23Z"
-  },
-  {
-    "id": "8e691b858756ea3086d0",
-    "region": "NORTH EASTERN REGION",
-    "area": "KALIKU, MALALANI, ENDAU",
-    "startTime": "2026-10-15T05:00:00Z",
-    "endTime": "2026-10-15T14:00:00Z",
-    "sourceUrl": "https://www.kplc.co.ke/storage/01M4B0P49VS4V5396C66BPHZQA.pdf",
-    "createdAt": "2026-10-15T15:48:23Z"
-  },
-  {
-    "id": "b55fe9844bc4f6f821de",
-    "region": "NAIROBI REGION",
-    "area": "KASARANI",
-    "startTime": "2026-10-15T06:00:00Z",
-    "endTime": "2026-10-15T14:00:00Z",
-    "sourceUrl": "https://www.kplc.co.ke/storage/01M4B0P49VS4V5396C66BPHZQA.pdf",
-    "createdAt": "2026-10-15T15:48:23Z"
-  },
-  {
-    "id": "ba22eacfcdbb1a64cc52",
-    "region": "NAIROBI REGION",
-    "area": "PART OF WESTLANDS",
-    "startTime": "2026-10-15T06:00:00Z",
-    "endTime": "2026-10-15T14:00:00Z",
-    "sourceUrl": "https://www.kplc.co.ke/storage/01M4B0P49VS4V5396C66BPHZQA.pdf",
-    "createdAt": "2026-10-15T15:48:23Z"
-  },
-  {
-    "id": "23edd5520f0ccbe525a7",
-    "region": "MT. KENYA REGION",
-    "area": "AAA GROWERS",
-    "startTime": "2026-10-15T06:00:00Z",
-    "endTime": "2026-10-15T14:00:00Z",
-    "sourceUrl": "https://www.kplc.co.ke/storage/01M4B0P49VS4V5396C66BPHZQA.pdf",
-    "createdAt": "2026-10-15T15:48:23Z"
-  },
-  {
-    "id": "fea440699a9012c11b73",
-    "region": "MT. KENYA REGION",
-    "area": "KIAMUIRU, GITHIRU, SATIMA",
-    "startTime": "2026-10-15T06:00:00Z",
-    "endTime": "2026-10-15T14:00:00Z",
-    "sourceUrl": "https://www.kplc.co.ke/storage/01M4B0P49VS4V5396C66BPHZQA.pdf",
-    "createdAt": "2026-10-15T15:48:23Z"
-  },
-  {
-    "id": "a07bc7257d73210f066e",
-    "region": "NORTH EASTERN REGION",
-    "area": "SASINI, TINGANGA",
-    "startTime": "2026-10-15T06:00:00Z",
-    "endTime": "2026-10-15T14:00:00Z",
-    "sourceUrl": "https://www.kplc.co.ke/storage/01M4B0P49VS4V5396C66BPHZQA.pdf",
-    "createdAt": "2026-10-15T15:48:23Z"
-  },
-  {
-    "id": "e5d4b3b296743623119c",
-    "region": "NORTH EASTERN REGION",
-    "area": "PART OF THINDIGUA",
-    "startTime": "2026-10-15T06:00:00Z",
-    "endTime": "2026-10-15T14:00:00Z",
-    "sourceUrl": "https://www.kplc.co.ke/storage/01M4B0P49VS4V5396C66BPHZQA.pdf",
-    "createdAt": "2026-10-15T15:48:23Z"
-  },
-  {
     "id": "5e14c4ca21b253a0685a",
     "region": "MT. KENYA REGION",
     "area": "MIKUMBUNE, NTEMWENE",
     "startTime": "2026-10-16T05:00:00Z",
     "endTime": "2026-10-16T14:00:00Z",
     "sourceUrl": "https://www.kplc.co.ke/storage/01M4B0P49VS4V5396C66BPHZQA.pdf",
-    "createdAt": "2026-10-15T15:48:23Z"
+    "createdAt": "2026-10-16T01:45:38Z"
   },
   {
     "id": "f68717f0a27022b7ed13",
@@ -96,6 +15,6 @@
     "startTime": "2026-10-16T06:00:00Z",
     "endTime": "2026-10-16T14:00:00Z",
     "sourceUrl": "https://www.kplc.co.ke/storage/01M4B0P49VS4V5396C66BPHZQA.pdf",
-    "createdAt": "2026-10-15T15:48:23Z"
+    "createdAt": "2026-10-16T01:45:38Z"
   }
 ]
